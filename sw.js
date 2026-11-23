@@ -1,5 +1,5 @@
-/* Service worker — offline shell for the quiz */
-const CACHE = "builder-quiz-v2";
+/* Service worker \u2014 offline shell for the quiz */
+const CACHE = "builder-quiz-v3";
 const ASSETS = [
   "./",
   "./index.html",
