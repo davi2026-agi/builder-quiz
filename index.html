@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Which Legendary Builder Are You?</title>
+<meta name="description" content="A 10-question mindset test for founders. Find the legendary historical figure who thinks the way you build.">
+<style>
+  :root{
+    --ink:#111113;
+    --sub:#6e6e73;
+    --line:#e6e6ea;
+    --bg:#ffffff;
+    --soft:#f5f5f7;
+    --accent:#8a6a3b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Inter,"Segoe UI",Roboto,Arial,sans-serif;
+    font-size:16px;line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:640px;margin:0 auto;padding:32px 24px 56px;}
+  .hidden{display:none!important;}
+
+  .brand{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--sub);}
+  h1{font-size:34px;line-height:1.15;letter-spacing:-.03em;font-weight:600;margin:14px 0 12px;}
+  .lead{color:var(--sub);font-size:16px;margin:0 0 28px;}
+  .rule{height:1px;background:var(--line);margin:28px 0;}
+  .meta{display:flex;gap:22px;margin:0 0 26px;}
+  .meta div{font-size:13px;color:var(--sub);}
+  .meta b{display:block;font-size:22px;color:var(--ink);font-weight:600;letter-spacing:-.02em;}
+
+  .btn{
+    display:block;width:100%;border:0;cursor:pointer;
+    background:var(--ink);color:#fff;font-size:16px;font-weight:500;
+    padding:17px 20px;border-radius:14px;letter-spacing:-.01em;
+    transition:transform .18s ease,opacity .18s ease;
+    font-family:inherit;
+  }
+  .btn:active{transform:scale(.98);opacity:.9;}
+  .btn.ghost{background:transparent;color:var(--sub);border:1px solid var(--line);}
+  .btn.light{background:var(--soft);color:var(--ink);}
+
+  .prog{display:flex;align-items:center;gap:12px;margin-bottom:30px;}
+  .bar{flex:1;height:2px;background:var(--line);border-radius:2px;overflow:hidden;}
+  .bar span{display:block;height:2px;background:var(--ink);width:0%;transition:width .3s ease;}
+  .count{font-size:12px;color:var(--sub);letter-spacing:.04em;font-variant-numeric:tabular-nums;}
+
+  .qnum{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:10px;}
+  h2{font-size:23px;line-height:1.3;letter-spacing:-.02em;font-weight:600;margin:0 0 24px;}
+  .opts{display:flex;flex-direction:column;gap:10px;}
+  .opt{
+    text-align:left;background:var(--soft);border:1px solid transparent;
+    border-radius:14px;padding:16px 18px;font-size:15.5px;line-height:1.45;
+    color:var(--ink);cursor:pointer;font-family:inherit;
+    transition:background .16s,border-color .16s,transform .16s;
+  }
+  .opt:active{transform:scale(.985);}
+  .opt.sel{border-color:var(--ink);background:#fff;}
+  .back{margin-top:26px;font-size:14px;color:var(--sub);background:none;border:0;padding:8px 0;cursor:pointer;font-family:inherit;}
+
+  .tag{display:inline-block;font-size:11px;letter-spacing:.18em;text-transform:uppercase;
+       color:var(--accent);border:1px solid #eadfcd;background:#fdfbf7;padding:7px 12px;border-radius:999px;}
+  .who{font-size:42px;line-height:1.05;letter-spacing:-.035em;font-weight:600;margin:18px 0 8px;}
+  .who-sub{font-size:17px;color:var(--sub);margin:0 0 26px;letter-spacing:-.01em;}
+  .sec-title{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--sub);margin:0 0 12px;}
+  .block{margin-bottom:26px;}
+  .insight p{margin:0 0 14px;font-size:16px;}
+  .share-box{background:var(--soft);border-radius:18px;padding:22px 20px;margin-top:8px;}
+  .share-box p{margin:0 0 16px;font-size:15px;}
+  .share-row{display:flex;gap:10px;}
+  .share-row .btn{padding:14px 12px;font-size:14.5px;border-radius:12px;}
+  .share-x{background:#111;color:#fff;}
+  .share-fb{background:#1877f2;color:#fff;}
+  .copy{margin-top:10px;}
+  .foot{font-size:12px;color:#a1a1a6;margin-top:34px;line-height:1.6;}
+  .toast{
+    position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
+    background:rgba(17,17,19,.92);color:#fff;font-size:13.5px;
+    padding:11px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s;z-index:9;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  @media(max-width:380px){ h1{font-size:28px;} .who{font-size:34px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ================= INTRO ================= -->
+  <section id="intro">
+    <div class="brand">Cognition Insider · Mindset Test</div>
+    <h1>Which legendary builder thinks like you?</h1>
+    <p class="lead">Ten questions. No sign-up. You get one historical mind, your strategic profile, and the one lesson that mind would give a founder today.</p>
+    <div class="meta">
+      <div><b>20</b>minds</div>
+      <div><b>10</b>questions</div>
+      <div><b>~2</b>minutes</div>
+    </div>
+    <button class="btn" onclick="start()">Start the test</button>
+    <div class="rule"></div>
+    <p class="foot">Built for founders, operators and investors. Results are a mirror, not a verdict.</p>
+  </section>
+
+  <!-- ================= QUIZ ================= -->
+  <section id="quiz" class="hidden">
+    <div class="prog">
+      <div class="count" id="count">1 / 10</div>
+      <div class="bar"><span id="barFill"></span></div>
+    </div>
+    <div class="qnum" id="qnum">Question 01</div>
+    <h2 id="qtext"></h2>
+    <div class="opts" id="opts"></div>
+    <button class="back" id="backBtn" onclick="prev()">← Back</button>
+  </section>
+
+  <!-- ================= RESULT ================= -->
+  <section id="result" class="hidden">
+    <span class="tag" id="rTag">Your match</span>
+    <div class="who" id="rName"></div>
+    <p class="who-sub" id="rTagline"></p>
+
+    <div class="block">
+      <div class="sec-title">Your strategic profile</div>
+      <div id="rProfile"></div>
+    </div>
+
+    <div class="block">
+      <div class="sec-title">The lesson you'd get</div>
+      <div class="insight" id="rInsight"></div>
+    </div>
+
+    <div class="share-box">
+      <p><strong>Screenshot this.</strong> Post it on X or Facebook, and tag a founder, co-founder or rival to see who they get.</p>
+      <div class="share-row">
+        <button class="btn share-x" onclick="shareX()">Share on X</button>
+        <button class="btn share-fb" onclick="shareFB()">Facebook</button>
+      </div>
+      <button class="btn ghost copy" onclick="copyLink()">Copy link</button>
+    </div>
+
+    <button class="btn light" style="margin-top:14px" onclick="reset()">Retake the test</button>
+    <p class="foot">Cognition Insider — weekly early-stage venture &amp; strategy briefings.</p>
+  </section>
+
+</div>
+<div class="toast" id="toast">Link copied</div>
+
+<script>
+/* ---------- 20 historical figures ---------- */
+const FIGURES = {
+  aristotle: { name:"Aristotle", tagline:"The Framework Builder",
+    profile:"<p>You think in structures. Before acting you map the terrain: what is true, what is merely assumed, what connects to what. You are patient with complexity and ruthless about clarity — people come to you not for tactics but for the frame.</p>",
+    insight:"<p>Your first edge is rule-design. A system takes years to build and one weak link to break, so you build the architecture others later live inside — and you audit the seams, not the walls.</p><p>Your second edge is compounding: a framework that keeps paying off is a private monopoly of understanding. The trap is that the frame which made you credible also makes you slow — keep part of your mind deliberately outside your own system.</p>" },
+
+  plato: { name:"Plato", tagline:"The Institution Founder",
+    profile:"<p>You don't build products, you build the place where products get made. Academies, methods, standards, doctrines — you bet on institutions outliving individuals, including you.</p>",
+    insight:"<p>An institution is the most durable form of leverage: it keeps compounding after you stop pushing. Founders who build the school beat founders who only win the round.</p><p>But institutions are fragile at the seams. One compromised principle, tolerated once, becomes the new standard — so the discipline you enforce in the quiet years is the whole asset. And respect is a system too: treat the people inside it as ends, not inputs, and the doctrine travels further than any mandate.</p>" },
+
+  archimedes: { name:"Archimedes", tagline:"The Leverage Seeker",
+    profile:"<p>You look for the one point where a small force moves everything. Most people optimise the surface; you relocate the fulcrum. You'd rather spend a week finding the right question than a month answering the wrong one.</p>",
+    insight:"<p>Strip the problem to fundamentals and rebuild upward — that is where disproportionate leverage comes from. Applied to business it means owning the chokepoint: the layer everyone must pass through, where a small toll on a massive flow becomes a fortune.</p><p>One caution: leverage only works if the ground is solid. Verify the assumption before you push, because a large force on a wrong premise destroys faster than it builds.</p>" },
+
+  alexander: { name:"Alexander the Great", tagline:"The Frontier Breaker",
+    profile:"<p>You go where the map ends. Crowded, mature markets are somebody else's home; the ignored segment, the unserved geography, the unglamorous niche — that is where you actually get to be first.</p>",
+    insight:"<p>Your advantage is attention arbitrage: everyone is looking at the same obvious prize, so the blind spot stays cheap and uncontested until someone like you arrives.</p><p>Your failure mode is overextension — conquest without consolidation. Pick one frontier, hold it, then build the system that makes the gain permanent before opening the next front.</p>" },
+
+  hannibal: { name:"Hannibal", tagline:"The Asymmetric Strategist",
+    profile:"<p>You refuse to fight on the enemy's terms. Where they are strong, you don't show up. You find the approach nobody fortified, and you pay in preparation what others pay in resources.</p>",
+    insight:"<p>The incumbent often cannot answer your move, because answering it would cannibalise its own best business. That gap is not a tactic — it is the entire strategy.</p><p>But asymmetry is cheap only once. The moment your trick works it becomes a known rule, and known rules favour whoever has more resources. Keep moving to the next unfortified ground.</p>" },
+
+  caesar: { name:"Julius Caesar", tagline:"The Coalition Expander",
+    profile:"<p>You win through access, not authorship. Alliances, gatekeepers, distribution — you assemble the channel and let others bring the goods. You read incentives better than intentions, which is why you can deal with people you don't fully trust.</p>",
+    insight:"<p>Your model is the platform: own the flow, take a thin cut of a very large volume, and let thousands of participants do the work. That is how the biggest fortunes in modern business were made — the toll booth, not the road.</p><p>Two warnings. Coalitions are borrowed power, so the value you hand your partners must stay undeniable. And the day you become the establishment, you inherit its blind spots.</p>" },
+
+  cleopatra: { name:"Cleopatra", tagline:"The Sovereign Negotiator",
+    profile:"<p>You never negotiate from weakness when you can negotiate from usefulness. You are fluent in the currency that actually moves powerful people: access, legitimacy, timing. Your power is the deal, not the army.</p>",
+    insight:"<p>Platform logic in a human key: you don't need to own the assets, only the passage between them. Take a modest share of a very large flow, and stay so useful that removing you costs more than paying you.</p><p>Two limits. Usefulness has to be renewed, never banked — one bad season and the terms reset. And sincerity toward smaller partners is the cheapest insurance a negotiator can carry; people forgive pricing, they don't forgive being used.</p>" },
+
+  leonardo: { name:"Leonardo da Vinci", tagline:"The Cross-Disciplinary Inventor",
+    profile:"<p>You compete on experience, not features. Obsessive simplification, craft in the last ten percent, the feeling that a thing works before you can explain why. You borrow freely across domains and refuse to be only one thing.</p>",
+    insight:"<p>Great products are usually one decision taken seriously, not twenty features added politely. Cut until it hurts, then ship — that discipline is what separates taste from vanity.</p><p>Your real danger is the opposite of most builders: you would rather perfect than release. Serious innovation almost always arrives ugly and half-built, so give yourself a deadline and a market before the craft eats the clock.</p>" },
+
+  michelangelo: { name:"Michelangelo", tagline:"The Perfectionist Craftsman",
+    profile:"<p>You believe the last five percent is the whole product. Craft is your competitive advantage: not features, not speed, but the unmistakable sense that a thing was made by someone who cared.</p>",
+    insight:"<p>The market cannot copy taste in a quarter; it can copy features in one. That is why craft remains one of the few durable moats left.</p><p>But perfectionism is a hidden cost centre. A great deal of excellent work dies finished and unreleased. Force a ship date, release it imperfect, and let real users pay for the polish.</p>" },
+
+  machiavelli: { name:"Niccolò Machiavelli", tagline:"The Incentive Architect",
+    profile:"<p>You don't argue with people, you redesign the situation they are standing in. Rules, incentives, defaults — you know most behaviour is a function of structure, not character.</p>",
+    insight:"<p>Whoever writes the rules collects from everyone who plays by them. That is a quieter and more durable monopoly than any single product.</p><p>Two cautions. A structure built on suspicion collapses the moment real trust is needed, and a structure without sincerity eventually teaches everyone to game it. Design the incentives, then be straight with people — cynicism is a bad long-term asset.</p>" },
+
+  napoleon: { name:"Napoleon", tagline:"The Order Reshaper",
+    profile:"<p>Established rules bore you because you can already see the faster route. You move at speed, force reality to catch up, and treat “that is how it is done” as an invitation rather than an answer.</p>",
+    insight:"<p>The incumbent's weakness is structural, not personal: it must defend yesterday's profit, which leaves the unprofitable new ground open. Attack where the money isn't yet, and let the leader's own success slow it down.</p><p>But speed without logistics is theatre. Build the boring backbone — systems, data, delivery — before the charge, or the first real winter undoes the whole campaign.</p>" },
+
+  socrates: { name:"Socrates", tagline:"The Assumption Challenger",
+    profile:"<p>You attack premises, which is the cheapest and most devastating form of competition. Where others accept the frame of the market, you ask who benefits from it being framed that way.</p>",
+    insight:"<p>Real opportunity hides in what everybody already “knows” — the crowded market that is crowded for a reason nobody has re-checked. Question the consensus, then go verify it in the field instead of in the debate.</p><p>The cost: questioning everything can quietly become a substitute for building anything. Pair one uncomfortable question with one shipped thing, every cycle.</p>" },
+
+  galileo: { name:"Galileo Galilei", tagline:"The Evidence Seeker",
+    profile:"<p>You don't win arguments, you settle them. One clean experiment outweighs ten confident opinions, and you'd rather be corrected by reality early than vindicated by a crowd late.</p>",
+    insight:"<p>Verify before you scale. The cost of testing a premise is trivial next to the cost of building on a false one, so keep the bets small, cheap and falsifiable.</p><p>And measurement is an asset, not a task: a competitor can copy your conclusion but not your dataset. Proprietary measurement is quietly one of the best moats there is.</p>" },
+
+  newton: { name:"Isaac Newton", tagline:"The System Unifier",
+    profile:"<p>You are unsatisfied with tactics. You want the single framework that explains all the cases, and you will spend long solitary years to find it — then hand it to everyone.</p>",
+    insight:"<p>Unification is leverage: one correct general rule replaces a thousand special cases, and everyone downstream pays you in attention, licence or dependency.</p><p>The risk is mistaking elegance for truth. Audit your own framework's seams, and keep one part of the plan that survives being wrong — because the thing that took years to build can fail on a single bad assumption.</p>" },
+
+  ada: { name:"Ada Lovelace", tagline:"The Abstraction Architect",
+    profile:"<p>You see the structure underneath the mess. You define the notation, the interface, the layer — the thing that lets other people do work they could never have done alone.</p>",
+    insight:"<p>Owning the abstraction layer is owning the toll booth: everyone above you pays in dependency, everyone below competes for your attention.</p><p>But an abstraction nobody uses is a private language. Pair the design with one real application early, or the elegance stays unread — and the market rewards what is used, not what is correct.</p>" },
+
+  curie: { name:"Marie Curie", tagline:"The Foundational Pioneer",
+    profile:"<p>You play the long, unfashionable game: foundational work nobody applauds, compounding slowly, then suddenly indispensable. You accept years of unglamorous iteration as the price of being right early.</p>",
+    insight:"<p>Bet on infrastructure rather than applications. Foundational layers are where durable advantage sits, because every competitor's product eventually has to pass through your work.</p><p>Two reminders. One flawed assumption can poison years of effort, so verify early and cheaply. And being quietly correct still needs distribution — if nobody can find your work, being right changes nothing.</p>" },
+
+  edison: { name:"Thomas Edison", tagline:"The Commercializer",
+    profile:"<p>You don't fall in love with the invention, you fall in love with the version people will actually buy. Iterate, package, price, repeat — until it works as a business, not just as a prototype.</p>",
+    insight:"<p>A mediocre product with a working distribution loop beats a brilliant one with none. Build the loop before the masterpiece — revenue is how you earn the right to keep iterating.</p><p>And habit is the deepest moat: a product people return to without deciding is worth far more than one they admire once. Design the return visit deliberately, not accidentally.</p>" },
+
+  polom: { name:"Marco Polo", tagline:"The Network Connector",
+    profile:"<p>You are paid for being between. You learn the routes, the customs, the gatekeepers, and you convert other people's distance into your margin.</p>",
+    insight:"<p>The real blind spot is usually geography, language or trust — places where the local seller cannot see the distant buyer and the buyer cannot see the seller. Standing in that gap is a business.</p><p>Networks decay quietly: one broken relationship severs more than one route. Keep the graph warm, and never let a single node hold everything you have.</p>" },
+
+  tesla: { name:"Nikola Tesla", tagline:"The Visionary Outlier",
+    profile:"<p>You see a version of the future so clearly that the present feels like a delay. You'd rather be early and misunderstood than on time and interchangeable.</p>",
+    insight:"<p>First principles, then one big bet: strip the assumption everyone inherited, and if the fundamentals say it is possible, the market's disbelief is your window of opportunity.</p><p>But a vision with one point of failure is a wager, not a strategy. Build the boring parts too — cash, contracts, allies — or the future arrives after you are gone.</p>" },
+
+  darwin: { name:"Charles Darwin", tagline:"The Patient Compounder",
+    profile:"<p>You collect small observations for years, refuse to force a conclusion, and let the pattern reveal itself. Your advantage is time horizon, not speed.</p>",
+    insight:"<p>Compounding is a strategy: a small edge repeated with discipline beats a large edge deployed once. Most people quit inside the flat part of the curve.</p><p>But patience needs feedback or it becomes stubbornness. Set checkpoints where reality is allowed to overrule you — a strong assumption held too long is just a slow version of being wrong.</p>" }
+};
+
+/* ---------- 10 questions ---------- */
+const QUESTIONS = [
+  { q:"A market is already crowded and mature. What do you actually do?",
+    o:[
+      {t:"Compete head-on and simply out-execute the leaders.", w:[["napoleon",2],["caesar",1]]},
+      {t:"Hunt for the blind spot everyone has stopped looking at.", w:[["alexander",2],["hannibal",1]]},
+      {t:"Join the strongest player and learn inside their rules.", w:[["aristotle",2],["plato",1]]},
+      {t:"Ignore it and design a different rule set entirely.", w:[["machiavelli",2],["cleopatra",1]]}
+    ]},
+  { q:"You are building something important. What worries you most?",
+    o:[
+      {t:"It burns cash long before it earns anything.", w:[["edison",2],["tesla",1]]},
+      {t:"One hidden flaw could collapse the whole structure.", w:[["newton",2],["aristotle",1]]},
+      {t:"A competitor copies the design within six months.", w:[["polom",2],["hannibal",1]]},
+      {t:"It is too complex for ordinary people to use.", w:[["leonardo",2],["michelangelo",1]]}
+    ]},
+  { q:"Which business model feels most like you?",
+    o:[
+      {t:"Sell a great one-off product at a fair price.", w:[["michelangelo",2],["leonardo",1]]},
+      {t:"Own a platform and take a slice of every transaction.", w:[["caesar",2],["polom",1]]},
+      {t:"Charge a high price for something only you can do.", w:[["archimedes",2],["plato",1]]},
+      {t:"Win on volume and cost, and grind the margin.", w:[["hannibal",2],["edison",1]]}
+    ]},
+  { q:"When you design a product, what convinces you it is right?",
+    o:[
+      {t:"Raw capability — it does things others can't.", w:[["tesla",2],["archimedes",1]]},
+      {t:"It feels effortless and obvious the moment you touch it.", w:[["leonardo",2],["michelangelo",1]]},
+      {t:"Users keep coming back without being asked twice.", w:[["cleopatra",2],["caesar",1]]},
+      {t:"Others build on top of it, so it becomes the base layer.", w:[["plato",2],["curie",1]]}
+    ]},
+  { q:"A dominant incumbent owns the space you want.",
+    o:[
+      {t:"Attack directly, with better resources and nerve.", w:[["napoleon",2],["alexander",1]]},
+      {t:"Move into a worse-looking niche they are happy to ignore.", w:[["hannibal",2],["machiavelli",1]]},
+      {t:"Partner with them and become indispensable to their machine.", w:[["cleopatra",2],["polom",1]]},
+      {t:"Wait, watch, and let their own inertia expose the gap.", w:[["darwin",2],["galileo",1]]}
+    ]},
+  { q:"Faced with a genuinely hard problem, your first move is to:",
+    o:[
+      {t:"Study how the best people already solve it, then improve on that.", w:[["aristotle",2],["galileo",1]]},
+      {t:"Break it into fundamentals and rebuild from zero.", w:[["archimedes",2],["newton",1]]},
+      {t:"Assemble the right people and pool capabilities.", w:[["caesar",2],["alexander",1]]},
+      {t:"Ship something small, iterate steadily, compound the gains.", w:[["curie",2],["edison",1]]}
+    ]},
+  { q:"How do you make an organisation scale?",
+    o:[
+      {t:"Train people into your method until it becomes a school.", w:[["plato",2],["aristotle",1]]},
+      {t:"Keep a small elite team with total autonomy and speed.", w:[["alexander",2],["hannibal",1]]},
+      {t:"Build systems and incentives so it runs without you.", w:[["machiavelli",2],["newton",1]]},
+      {t:"Stay small, keep the margin and refuse to dilute the work.", w:[["michelangelo",2],["leonardo",1]]}
+    ]},
+  { q:"How do you decide what is actually true?",
+    o:[
+      {t:"Run my own experiments. Data beats consensus.", w:[["galileo",2],["darwin",1]]},
+      {t:"Reason from first principles until it holds together.", w:[["newton",2],["archimedes",1]]},
+      {t:"Ask who benefits from the current story being believed.", w:[["socrates",2],["machiavelli",1]]},
+      {t:"Go into the field and watch what users really do.", w:[["darwin",2],["cleopatra",1]]}
+    ]},
+  { q:"Ten years out, what does winning look like?",
+    o:[
+      {t:"I designed the layer everyone else has to build on.", w:[["ada",2],["plato",1]]},
+      {t:"I opened a market nobody knew existed.", w:[["polom",2],["alexander",1]]},
+      {t:"The product carries my name and nobody can copy the craft.", w:[["edison",2],["michelangelo",1]]},
+      {t:"I proved something the whole field now has to build on.", w:[["curie",2],["machiavelli",1]]}
+    ]},
+  { q:"Which risk are you genuinely comfortable taking?",
+    o:[
+      {t:"Bet everything on one decisive, visionary move.", w:[["tesla",2],["alexander",1]]},
+      {t:"Build in public and let a hostile market judge me.", w:[["socrates",2],["galileo",1]]},
+      {t:"Test it myself until the numbers overrule the experts.", w:[["galileo",2],["newton",1]]},
+      {t:"Build the abstraction nobody has asked for yet.", w:[["ada",2],["curie",1]]}
+    ]}
+];
+
+/* ---------- state ---------- */
+let step = 0, answers = [];
+const $ = id => document.getElementById(id);
+
+function start(){
+  step = 0; answers = [];
+  $("intro").classList.add("hidden");
+  $("result").classList.add("hidden");
+  $("quiz").classList.remove("hidden");
+  render();
+}
+
+function render(){
+  const q = QUESTIONS[step];
+  $("count").textContent = (step+1) + " / " + QUESTIONS.length;
+  $("barFill").style.width = (step / QUESTIONS.length * 100) + "%";
+  $("qnum").textContent = "Question " + String(step+1).padStart(2,"0");
+  $("qtext").textContent = q.q;
+  $("backBtn").style.visibility = step === 0 ? "hidden" : "visible";
+  const box = $("opts");
+  box.innerHTML = "";
+  q.o.forEach((opt,i) => {
+    const b = document.createElement("button");
+    b.className = "opt";
+    b.textContent = opt.t;
+    b.onclick = () => choose(i,b);
+    box.appendChild(b);
+  });
+  window.scrollTo({top:0});
+}
+
+function choose(i, el){
+  [...document.querySelectorAll(".opt")].forEach(x => x.classList.remove("sel"));
+  el.classList.add("sel");
+  answers[step] = i;
+  setTimeout(() => {
+    if (step < QUESTIONS.length - 1){ step++; render(); }
+    else { showResult(); }
+  }, 200);
+}
+
+function prev(){ if (step > 0){ step--; render(); } }
+
+function score(){
+  const s = {};
+  Object.keys(FIGURES).forEach(k => s[k] = 0);
+  answers.forEach((ai, qi) => {
+    const opt = QUESTIONS[qi] && QUESTIONS[qi].o[ai];
+    if (!opt) return;
+    opt.w.forEach(([k,v]) => { s[k] = (s[k] || 0) + v; });
+  });
+  let best = null, bestScore = -1;
+  Object.keys(s).forEach(k => { if (s[k] > bestScore){ bestScore = s[k]; best = k; } });
+  return best || "aristotle";
+}
+
+function showResult(){
+  const f = FIGURES[score()];
+  $("rName").textContent = f.name;
+  $("rTagline").textContent = f.tagline;
+  $("rProfile").innerHTML = f.profile;
+  $("rInsight").innerHTML = f.insight;
+  $("quiz").classList.add("hidden");
+  $("result").classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"smooth"});
+}
+
+/* ---------- share ---------- */
+function shareText(){
+  const name = $("rName").textContent, tag = $("rTagline").textContent;
+  return "I got " + name + " — " + tag + ". Which legendary builder thinks like you? 10 questions, no sign-up:";
+}
+function shareX(){
+  window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText()) +
+              "&url=" + encodeURIComponent(location.href), "_blank");
+}
+function shareFB(){
+  window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href), "_blank");
+}
+function copyLink(){
+  const txt = shareText() + " " + location.href;
+  const done = () => { const t=$("toast"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done).catch(done);
+  } else {
+    const ta = document.createElement("textarea");
+    ta.value = txt; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta); done();
+  }
+}
+function reset(){ $("result").classList.add("hidden"); start(); }
+</script>
+</body>
+</html>
