@@ -159,6 +159,13 @@
 <div class="toast" id="toast">Link copied</div>
 
 <script>
+/* ---------- anonymous analytics (no cookies, no personal data) ---------- */
+const TRACK_NS = "ci-bq-7d3x";
+const TRACK_BASE = "https://abacus.jasoncameron.dev/hit/" + TRACK_NS + "/";
+function track(key){
+  try { new Image().src = TRACK_BASE + encodeURIComponent(key) + "?t=" + Date.now(); } catch(e) {}
+}
+
 /* ---------- 20 historical figures ---------- */
 const FIGURES = {
   aristotle: { name:"Aristotle", tagline:"The Framework Builder",
@@ -322,6 +329,7 @@ const $ = id => document.getElementById(id);
 
 function start(){
   step = 0; answers = [];
+  track("starts");
   $("intro").classList.add("hidden");
   $("result").classList.add("hidden");
   $("quiz").classList.remove("hidden");
@@ -373,7 +381,10 @@ function score(){
 }
 
 function showResult(){
-  const f = FIGURES[score()];
+  const key = score();
+  const f = FIGURES[key];
+  track("finishes");
+  track("f_" + key);
   $("rName").textContent = f.name;
   $("rTagline").textContent = f.tagline;
   $("rProfile").innerHTML = f.profile;
@@ -389,13 +400,16 @@ function shareText(){
   return "I got " + name + " — " + tag + ". Which legendary builder thinks like you? 10 questions, no sign-up:";
 }
 function shareX(){
+  track("shares");
   window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText()) +
               "&url=" + encodeURIComponent(location.href), "_blank");
 }
 function shareFB(){
+  track("shares");
   window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href), "_blank");
 }
 function copyLink(){
+  track("shares");
   const txt = shareText() + " " + location.href;
   const done = () => { const t=$("toast"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
   if (navigator.clipboard && navigator.clipboard.writeText){
@@ -442,6 +456,16 @@ window.addEventListener("appinstalled", () => {
     const h = document.getElementById("iosHint");
     if (h) h.classList.remove("hidden");
   }
+})();
+
+// count one visit per browser session
+(function(){
+  try {
+    if (!sessionStorage.getItem("bq_session")) {
+      sessionStorage.setItem("bq_session", "1");
+      track("visits");
+    }
+  } catch(e) { track("visits"); }
 })();
 
 if ("serviceWorker" in navigator) {
