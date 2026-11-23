@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Which Legendary Builder Are You?</title>
+<meta name="theme-color" content="#111113">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Builder Quiz">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="A 10-question mindset test for founders. Find the legendary historical figure who thinks the way you build.">
 <style>
   :root{
@@ -77,6 +84,7 @@
   .share-fb{background:#1877f2;color:#fff;}
   .copy{margin-top:10px;}
   .foot{font-size:12px;color:#a1a1a6;margin-top:34px;line-height:1.6;}
+  .ioshint{font-size:13px;color:var(--sub);margin:10px 2px 0;line-height:1.5;}
   .toast{
     position:fixed;left:50%;bottom:28px;transform:translateX(-50%) translateY(20px);
     background:rgba(17,17,19,.92);color:#fff;font-size:13.5px;
@@ -100,6 +108,8 @@
       <div><b>~2</b>minutes</div>
     </div>
     <button class="btn" onclick="start()">Start the test</button>
+    <button class="btn ghost install hidden" id="installBtn" onclick="doInstall()" style="margin-top:10px">Add to home screen</button>
+    <p class="ioshint hidden" id="iosHint">On iPhone: tap the Share icon, then “Add to Home Screen”.</p>
     <div class="rule"></div>
     <p class="foot">Built for founders, operators and investors. Results are a mirror, not a verdict.</p>
   </section>
@@ -398,6 +408,47 @@ function copyLink(){
   }
 }
 function reset(){ $("result").classList.add("hidden"); start(); }
+
+/* ---------- PWA: install + offline ---------- */
+let deferredPrompt = null;
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  const b = document.getElementById("installBtn");
+  if (b) b.classList.remove("hidden");
+});
+
+function doInstall(){
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(() => {
+    deferredPrompt = null;
+    const b = document.getElementById("installBtn");
+    if (b) b.classList.add("hidden");
+  });
+}
+
+window.addEventListener("appinstalled", () => {
+  const b = document.getElementById("installBtn");
+  if (b) b.classList.add("hidden");
+});
+
+// iOS Safari has no install prompt — show the manual hint once
+(function(){
+  const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const standalone = window.navigator.standalone === true;
+  if (isIOS && !standalone) {
+    const h = document.getElementById("iosHint");
+    if (h) h.classList.remove("hidden");
+  }
+})();
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
