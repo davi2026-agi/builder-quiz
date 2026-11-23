@@ -1,5 +1,5 @@
 /* Service worker — offline shell for the quiz */
-const CACHE = "builder-quiz-v1";
+const CACHE = "builder-quiz-v2";
 const ASSETS = [
   "./",
   "./index.html",
