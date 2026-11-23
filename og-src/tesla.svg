@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0d0d10"/>
+  <text x="1130" y="500" font-family="Noto Serif Display, Noto Serif, DejaVu Serif" font-size="340" fill="#17171c" text-anchor="end">?</text>
+  <rect x="80" y="96" width="54" height="3" fill="#c39a63"/>
+  <text x="152" y="108" font-family="DejaVu Sans, Noto Sans" font-size="20" letter-spacing="5" fill="#c39a63">COGNITION INSIDER</text>
+  <text x="1120" y="108" font-family="DejaVu Sans, Noto Sans" font-size="19" letter-spacing="3" fill="#8d8d96" text-anchor="end">19 / 20</text>
+  <text x="80" y="316" font-family="Noto Serif Display, Noto Serif, DejaVu Serif" font-size="114" fill="#f7f5f1">Nikola Tesla</text>
+  <text x="80" y="386" font-family="DejaVu Sans, Noto Sans" font-size="26" letter-spacing="1" fill="#c39a63">THE VISIONARY OUTLIER</text>
+  <line x1="80" y1="470" x2="1120" y2="470" stroke="#2a2a30" stroke-width="1"/>
+  <text x="80" y="522" font-family="DejaVu Sans, Noto Sans" font-size="23" fill="#a9a9b2">Which legendary builder thinks like you?  ·  10 questions  ·  no sign-up</text>
+  <text x="80" y="566" font-family="DejaVu Sans, Noto Sans" font-size="23" letter-spacing="2" fill="#c39a63">davi2026-agi.github.io/builder-quiz</text>
+</svg>

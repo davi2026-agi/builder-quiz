@@ -12,6 +12,20 @@
 <meta name="apple-mobile-web-app-title" content="Builder Quiz">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="description" content="A 10-question mindset test for founders. Find the legendary historical figure who thinks the way you build.">
+<!-- og:cards -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Cognition Insider">
+<meta property="og:title" content="Which legendary builder thinks like you?">
+<meta property="og:description" content="Ten questions. No sign-up. One historical mind, your strategic profile, and the lesson that mind would give you today.">
+<meta property="og:image" content="https://davi2026-agi.github.io/builder-quiz/og/default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://davi2026-agi.github.io/builder-quiz/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Which legendary builder thinks like you?">
+<meta name="twitter:description" content="Ten questions. No sign-up. One historical mind, your strategic profile, and the lesson that mind would give you today.">
+<meta name="twitter:image" content="https://davi2026-agi.github.io/builder-quiz/og/default.png">
+
 <style>
   :root{
     --ink:#111113;
@@ -83,6 +97,8 @@
   .share-x{background:#111;color:#fff;}
   .share-fb{background:#1877f2;color:#fff;}
   .copy{margin-top:10px;}
+  .perm{margin:14px 0 0;font-size:13px;}
+  .perm a{color:var(--sub);text-decoration:none;border-bottom:1px solid var(--line);padding-bottom:2px;}
   .foot{font-size:12px;color:#a1a1a6;margin-top:34px;line-height:1.6;}
   .ioshint{font-size:13px;color:var(--sub);margin:10px 2px 0;line-height:1.5;}
   .toast{
@@ -149,6 +165,7 @@
         <button class="btn share-fb" onclick="shareFB()">Facebook</button>
       </div>
       <button class="btn ghost copy" onclick="copyLink()">Copy link</button>
+      <p class="perm"><a id="permLink" href="#" target="_blank">Preview your share card →</a></p>
     </div>
 
     <button class="btn light" style="margin-top:14px" onclick="reset()">Retake the test</button>
@@ -325,6 +342,7 @@ const QUESTIONS = [
 
 /* ---------- state ---------- */
 let step = 0, answers = [];
+let RESULT_KEY = null;
 const $ = id => document.getElementById(id);
 
 function start(){
@@ -389,12 +407,22 @@ function showResult(){
   $("rTagline").textContent = f.tagline;
   $("rProfile").innerHTML = f.profile;
   $("rInsight").innerHTML = f.insight;
+  RESULT_KEY = key;
+  const perm = $("permLink");
+  if (perm) perm.href = resultUrl(key);
   $("quiz").classList.add("hidden");
   $("result").classList.remove("hidden");
   window.scrollTo({top:0, behavior:"smooth"});
 }
 
 /* ---------- share ---------- */
+function resultUrl(key){
+  return location.origin + location.pathname.replace(/[^/]*$/, "") + "r/" + key + ".html";
+}
+function shareTarget(){
+  return RESULT_KEY ? resultUrl(RESULT_KEY) : location.href;
+}
+
 function shareText(){
   const name = $("rName").textContent, tag = $("rTagline").textContent;
   return "I got " + name + " — " + tag + ". Which legendary builder thinks like you? 10 questions, no sign-up:";
@@ -402,15 +430,15 @@ function shareText(){
 function shareX(){
   track("shares");
   window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(shareText()) +
-              "&url=" + encodeURIComponent(location.href), "_blank");
+              "&url=" + encodeURIComponent(shareTarget()), "_blank");
 }
 function shareFB(){
   track("shares");
-  window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(location.href), "_blank");
+  window.open("https://www.facebook.com/sharer/sharer.php?u=" + encodeURIComponent(shareTarget()), "_blank");
 }
 function copyLink(){
   track("shares");
-  const txt = shareText() + " " + location.href;
+  const txt = shareText() + " " + shareTarget();
   const done = () => { const t=$("toast"); t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),1600); };
   if (navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(txt).then(done).catch(done);
