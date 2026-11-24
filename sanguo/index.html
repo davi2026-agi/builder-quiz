@@ -72,6 +72,14 @@
   }
   .guide b{color:var(--accent)}
   .guide .tag{display:inline-block;font-size:10.5px;background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:1px 8px;margin-right:6px;font-weight:700}
+  .loginrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--line)}
+  .btn-primary{
+    display:inline-block;flex:0 0 auto;font-size:12.5px;font-weight:700;
+    background:var(--accent);color:#fff;border-radius:999px;padding:8px 16px;
+    text-decoration:none;line-height:1.3;
+  }
+  .login-hint{flex:1 1 200px;min-width:0;font-size:12px;line-height:1.6;color:var(--ink2)}
+  .login-hint b{color:var(--accent)}
 
   /* ---------- article ---------- */
   article{margin-top:26px}
@@ -158,6 +166,10 @@
 
   <div class="guide">
     <span class="tag">共读批注</span><b>怎么写笔记：</b>用手指或鼠标<b>选中你想标记的句子</b>，在弹出的工具条里选择高亮或批注，写下你的感想。批注默认公开，群里每一位打开这个链接的人，都能看到别人写在原文旁边的笔记。
+    <div class="loginrow">
+      <a class="btn-primary" href="https://hypothes.is/signup" target="_blank" rel="noopener">免费注册（邮箱即可，1 分钟）</a>
+      <span class="login-hint">只看别人写的笔记<b>不用注册</b>；自己要写才需要一个免费账号（邮箱加密码，不用实名、不绑手机）。注册后回到本页，点右上角那个「书签」图标打开侧栏，里面有「登录」，登一次之后浏览器会一直记住。</span>
+    </div>
   </div>
 
   <article id="article">
@@ -189,7 +201,7 @@
 
   <footer>
     <p><b>版权说明：</b>《三国演义》原著作者罗贯中（元末明初），文本已进入公有领域，可自由阅读、转载与制作共读页面；现代校注本、今译本、白话改写本的新增内容仍受版权保护，本页面使用公版原文。</p>
-    <p><b>批注服务：</b>页面批注由 Hypothesis 公共服务提供，需联网加载；若当前网络环境下未出现批注工具条，说明该服务暂不可达，可在网络可用时再打开。</p>
+    <p><b>批注服务：</b>页面批注由 Hypothesis 公共服务提供，需联网加载；若当前网络环境下未出现批注工具条，说明该服务暂不可达，可在网络可用时再打开。看别人的笔记不需要注册，自己写笔记需要一个免费账号。</p>
     <p>本页面为共读 Demo，共 19 段；后续回目将按同一版式陆续加入。</p>
   </footer>
 
