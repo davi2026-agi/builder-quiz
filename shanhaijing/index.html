@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>山海经 · 招摇之山 · 视觉小说试玩</title>
+<meta name="description" content="《山海经·南山经》改编视觉小说试玩：你是奉命作图的画工，祝余、迷榖、狌狌、育沛，记与不记由你决定。">
+<style>
+:root{
+  --ink:#20180f; --paper:#f3ece0; --paper2:#e8dfd0; --jade:#3f5f52; --cinnabar:#8d3b2a;
+  --mist:rgba(255,255,255,.55);
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;background:#0d0b09;color:var(--ink);
+  font-family:"Songti SC","STSong","SimSun","Source Han Serif SC",serif;
+  overflow:hidden;
+}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;background:#0d0b09}
+
+/* 山水背景 */
+.bg{position:absolute;inset:0;overflow:hidden;
+  background:linear-gradient(#fbf6ec 0%,#efe7d8 42%,#d9cfba 72%,#b8ad96 100%)}
+.hill{position:absolute;left:-5%;right:-5%;bottom:0;height:62%;pointer-events:none}
+.hill svg{width:100%;height:100%;display:block}
+.hill.far{opacity:.32;bottom:26%;transform:scale(1.15)}
+.hill.mid{opacity:.55;bottom:8%}
+.hill.near{opacity:.85;bottom:-6%}
+.sun{position:absolute;right:6%;top:7%;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,rgba(141,59,42,.13),rgba(141,59,42,.01) 72%);filter:blur(6px)}
+.fog{position:absolute;inset:0;pointer-events:none;
+  background:
+   radial-gradient(60% 30% at 18% 62%,var(--mist),transparent 70%),
+   radial-gradient(50% 26% at 76% 74%,var(--mist),transparent 70%);
+  animation:drift 18s ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate3d(-1.5%,0,0) scale(1.02)}to{transform:translate3d(1.5%,-1%,0) scale(1.06)}}
+
+/* 顶部 */
+.bar{position:relative;z-index:6;display:flex;align-items:center;gap:10px;
+  padding:14px 18px 0;color:#4b3f30;font-size:12px;letter-spacing:.18em}
+.bar .t{flex:1;opacity:.75}
+.bar button{font-family:inherit;font-size:12px;letter-spacing:.08em;color:#4b3f30;
+  background:rgba(255,255,255,.5);border:1px solid rgba(75,63,48,.25);
+  border-radius:999px;padding:6px 12px;cursor:pointer;backdrop-filter:blur(4px)}
+.bar button:active{opacity:.7}
+
+/* 幕名 */
+.chapter{position:relative;z-index:5;text-align:center;margin-top:6vh;
+  transition:opacity .5s ease,transform .5s ease}
+.chapter .no{font-size:12px;letter-spacing:.4em;color:#8d3b2a;opacity:.85}
+.chapter .nm{margin-top:14px;font-size:30px;letter-spacing:.34em;color:#2c2418;font-weight:700;
+  text-indent:.34em}
+.chapter .en{margin-top:10px;font-size:11px;letter-spacing:.3em;color:#6d6152}
+.chapter.out{opacity:0;transform:translateY(-8px)}
+
+/* 对话 */
+.dlg{position:absolute;left:0;right:0;bottom:0;z-index:8;padding:0 14px calc(14px + env(safe-area-inset-bottom));
+  transition:opacity .35s ease,transform .35s ease}
+.dlg.in{opacity:1;transform:translateY(0)}
+.dlg.out{opacity:0;transform:translateY(14px);pointer-events:none}
+.who{display:inline-block;font-size:12.5px;letter-spacing:.2em;color:var(--cinnabar);
+  background:rgba(243,236,224,.92);border:1px solid rgba(141,59,42,.22);border-radius:4px;
+  padding:3px 10px;margin:0 0 -1px 10px;position:relative;z-index:2}
+.box{position:relative;background:rgba(247,242,232,.94);border:1px solid rgba(75,63,48,.28);
+  border-radius:10px;padding:16px 18px 30px;min-height:132px;
+  box-shadow:0 6px 26px rgba(40,28,16,.18);backdrop-filter:blur(6px)}
+.txt{font-size:17px;line-height:1.95;letter-spacing:.03em;color:#241c12;
+  text-align:justify;white-space:pre-wrap}
+.cursor{position:absolute;right:14px;bottom:10px;font-size:11px;letter-spacing:.16em;
+  color:#8a7c68;opacity:.85;animation:blink 1.4s steps(2,end) infinite}
+@keyframes blink{50%{opacity:.25}}
+.q{display:none;margin:10px 0 0;font-size:12px;letter-spacing:.06em;color:#5f6b58;
+  border-left:2px solid rgba(63,95,82,.5);padding-left:8px;line-height:1.7}
+
+/* 选项（嵌在对话框内） */
+.choices{display:none;flex-direction:column;gap:9px;margin-top:14px}
+.ch{font-family:inherit;text-align:left;font-size:15px;line-height:1.6;color:#241c12;
+  background:rgba(255,251,243,.99);border:1px solid rgba(75,63,48,.28);border-radius:9px;
+  padding:12px 15px;cursor:pointer;letter-spacing:.02em;
+  box-shadow:0 2px 10px rgba(40,28,16,.08)}
+.ch:active{background:rgba(238,229,212,.98);transform:scale(.99)}
+
+/* 原文卡 */
+.card{position:fixed;inset:0;z-index:20;background:rgba(18,14,10,.55);
+  display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(3px)}
+.card.on{display:flex}
+.card .in{max-width:560px;max-height:82vh;overflow:auto;background:#fbf7ee;border-radius:12px;
+  padding:22px 20px;border:1px solid rgba(75,63,48,.3);box-shadow:0 20px 60px rgba(0,0,0,.4)}
+.card h3{margin:0 0 6px;font-size:15px;letter-spacing:.2em;color:#8d3b2a}
+.card .sub{font-size:11px;letter-spacing:.16em;color:#8a7c68;margin-bottom:14px}
+.card p{margin:0;font-size:14px;line-height:2.05;color:#2a2216;text-align:justify;letter-spacing:.02em}
+.card .gl{margin-top:16px;padding-top:12px;border-top:1px dashed rgba(75,63,48,.28);
+  font-size:12.5px;color:#6d6152;line-height:1.9}
+.card .x{margin-top:16px;width:100%;font-family:inherit;font-size:13px;letter-spacing:.16em;
+  background:#8d3b2a;color:#fff;border:0;border-radius:999px;padding:11px;cursor:pointer}
+
+/* 结局 */
+.end{position:absolute;inset:0;z-index:15;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:26px;text-align:center;
+  background:linear-gradient(180deg,rgba(251,246,236,.55),rgba(214,203,182,.92))}
+.end.on{display:flex}
+.end .tag{font-size:11px;letter-spacing:.36em;color:#8d3b2a}
+.end .tt{margin:14px 0 0;font-size:27px;letter-spacing:.3em;color:#2c2418;font-weight:700;text-indent:.3em}
+.end .p{margin-top:16px;max-width:540px;font-size:15px;line-height:2.05;color:#2a2216;text-align:justify}
+.end .quote{margin-top:18px;max-width:540px;font-size:12.5px;color:#7a6a54;line-height:1.9;
+  border-left:2px solid rgba(141,59,42,.45);padding-left:10px;text-align:left}
+.end .act{margin-top:28px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.end .act button{font-family:inherit;font-size:13px;letter-spacing:.14em;border-radius:999px;
+  padding:11px 22px;cursor:pointer;border:1px solid rgba(75,63,48,.3)}
+.end .act .r{background:#8d3b2a;color:#fff;border-color:#8d3b2a}
+.end .act .s{background:rgba(255,255,255,.7);color:#3a3024}
+.end .hint{margin-top:16px;font-size:11.5px;letter-spacing:.14em;color:#8a7c68}
+
+@media(max-width:480px){
+  .chapter{margin-top:4.5vh}
+  .chapter .nm{font-size:24px}
+  .txt{font-size:16px}
+  .box{min-height:116px;padding:14px 15px 26px}
+  .txt{line-height:1.85}
+  .ch{font-size:14.5px;padding:11px 14px}
+}
+@media(min-width:900px){
+  #app{max-width:640px;margin:0 auto;box-shadow:0 0 80px rgba(0,0,0,.6)}
+  body{background:#080706}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="bg">
+    <div class="sun"></div>
+    <div class="hill far" id="hFar"></div>
+    <div class="hill mid" id="hMid"></div>
+    <div class="hill near" id="hNear"></div>
+    <div class="fog"></div>
+  </div>
+
+  <div class="bar">
+    <span class="t">山海经 · 南山经 · 其一</span>
+    <button id="btnSrc">原文</button>
+  </div>
+
+  <div class="chapter" id="chapter">
+    <div class="no">第 一 幕</div>
+    <div class="nm" id="chName">招摇之山</div>
+    <div class="en" id="chEn">临于西海之上</div>
+  </div>
+
+  <div class="dlg out" id="dlg">
+    <div class="who" id="who">你</div>
+    <div class="box">
+      <div class="txt" id="txt"></div>
+      <div class="q" id="q"></div>
+      <div class="choices" id="choices"></div>
+      <div class="cursor" id="cur">点 击 继 续</div>
+    </div>
+  </div>
+
+  <div class="end" id="end">
+    <div class="tag" id="endTag">图 成</div>
+    <div class="tt" id="endTt"></div>
+    <div class="p" id="endP"></div>
+    <div class="quote" id="endQ"></div>
+    <div class="act">
+      <button class="r" id="btnReplay">重新入山</button>
+      <button class="s" id="btnSrc2">看原文</button>
+    </div>
+    <div class="hint">本幕共三种结局：图成 · 伪经 · 无字之图</div>
+  </div>
+</div>
+
+<div class="card" id="card">
+  <div class="in">
+    <h3>南山经 · 招摇之山</h3>
+    <div class="sub">《山海经》第一卷 · 公版原文</div>
+    <p>南山经之首曰鹊山。其首曰招摇之山，临于西海之上，多桂，多金玉。有草焉，其状如韭而青华，其名曰祝余，食之不饥。有木焉，其状如榖而黑理，其华四照，其名曰迷榖，佩之不迷。有兽焉，其状如禺而白耳，伏行人走，其名曰狌狌，食之善走。丽麂之水出焉，而西流注于海，其中多育沛，佩之无瘕疾。</p>
+    <div class="gl">注：本作为公版原文的改编演绎。「食之不饥」「佩之不迷」「佩之无瘕疾」等功效，皆为原书记载，非现代验证结论；游戏中的"记录"与"存疑"，正是原书留给后人的问题。</div>
+    <button class="x" id="cardX">合 上</button>
+  </div>
+</div>
+
+<script>
+/* ---------- 山形（水墨矢量，避免外部图片） ---------- */
+function hill(seed,w,h,op,color){
+  var pts=[],n=7,x;
+  for(var i=0;i<=n;i++){
+    x=i/n*w;
+    var y=h*0.55 - Math.sin(i*1.7+seed)*h*0.18 - Math.sin(i*0.6+seed*2)*h*0.22;
+    pts.push([x,y]);
+  }
+  var d="M0,"+h+" L0,"+pts[0][1].toFixed(1);
+  pts.forEach(function(p){d+=" L"+p[0].toFixed(1)+","+p[1].toFixed(1)});
+  d+=" L"+w+","+h+" Z";
+  return '<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none">'+
+    '<path d="'+d+'" fill="'+color+'" opacity="'+op+'"/>'+
+    '<path d="'+d+'" fill="none" stroke="rgba(60,48,34,.35)" stroke-width="1"/>'+
+    '</svg>';
+}
+document.getElementById('hFar').innerHTML=hill(1.2,1000,520,1,'#b9b09a');
+document.getElementById('hMid').innerHTML=hill(2.6,1000,520,1,'#9d9481');
+document.getElementById('hNear').innerHTML=hill(4.1,1000,520,1,'#6f6a58');
+
+/* ---------- 剧本 ---------- */
+var S={
+start:{who:'',txt:'奉诏作图，自西海之滨入山。\n行囊里只有三样东西：一支笔、一卷素帛、三日的干粮。',
+  next:'old'},
+old:{who:'老樵',txt:'官家画工？这山进不得。\n前头有吃了不饿的，也有吃了就跑的——都不是人能受用的东西。',
+  q:'原文：多桂，多金玉。',
+  choices:[
+    {t:'多谢老丈。我记下了。',set:{polite:1},next:'path'},
+    {t:'我只画，不吃。',set:{proud:1},next:'path'}
+  ]},
+path:{who:'',txt:'山径渐窄。桂叶擦过肩头，石缝里闪着金与玉的光。\n走了半日，你才发现自己在原地绕。',
+  next:'zhuyu'},
+zhuyu:{who:'',txt:'一丛草拦住去路：叶如韭，开着青色的花。\n你已经饿了三天。',
+  q:'原文：其名曰祝余，食之不饥。',
+  choices:[
+    {t:'拔而食之。',set:{eat:1},next:'eatY'},
+    {t:'忍住，只画下来。',set:{draw:1},next:'eatN'}
+  ]},
+eatY:{who:'',txt:'入口清苦，回甘。\n片刻之后，胃里安静下来，脚下生了风——"食之不饥"，这四个字你信了。',
+  next:'xingxing'},
+eatN:{who:'',txt:'你把它一笔一笔描在素帛上，肚子叫得更响。\n落笔时你在旁边加了一行小字：未验。',
+  next:'xingxing'},
+xingxing:{who:'',txt:'树影里忽然有东西人立而起。\n白耳，伏行，此刻正学你的样子走路，一步一顿，连你袖子的摆动都学。',
+  q:'原文：其状如禺而白耳，伏行人走，其名曰狌狌。',
+  choices:[
+    {t:'追上去，看个清楚。',set:{chase:1},next:'run'},
+    {t:'站着不动，任它学。',set:{still:1},next:'still'},
+    {t:'掰一半干粮，放在石上。',set:{feed:1},next:'feed'}
+  ]},
+run:{who:'',txt:'它跑得比你快得多，下坡时四足并用，像在笑你。\n你只记下两个字：善走。',
+  next:'migu'},
+still:{who:'',txt:'它学你，你学它。半晌它先不耐烦，窜上树去，回头看了你一眼。\n那一眼里没有兽类的空茫，倒像在打量一个同类。',
+  next:'migu'},
+feed:{who:'',txt:'它拿了干粮，没吃，先嗅，再塞进颊囊，然后蹲下来看你画图。\n你忽然觉得，它不是野兽，是个不肯开口的同行。',
+  next:'migu'},
+migu:{who:'',txt:'天色暗下来。你第三次看见同一块青石，第三次在同一个岔口折返。',
+  q:'原文：其名曰迷榖，佩之不迷。',
+  choices:[
+    {t:'折一枝迷榖，佩在身上。',set:{peimigu:1},next:'water'},
+    {t:'不折。靠星辰辨路。',set:{stars:1},next:'water'}
+  ]},
+water:{who:'',txt:'夜里到了水边。溪水西流，注入大海，水底沉着温润如脂的东西，一枚枚，映着月光。',
+  q:'原文：丽麂之水出焉，而西流注于海，其中多育沛，佩之无瘕疾。',
+  next:'old2'},
+old2:{who:'老樵',txt:'育沛啊。佩之无瘕疾——这话是贩子说的。\n我一个种地的，没验过。你要是画进图里，就替他们把话说实了。',
+  choices:[
+    {t:'取一枚佩上。',set:{wear:1},next:'night'},
+    {t:'只画，不取。',set:{nowear:1},next:'night'},
+    {t:'取一枚，收进囊里，不佩。',set:{pocket:1},next:'night'}
+  ]},
+night:{who:'',txt:'你在石上铺开素帛。山风把纸吹得哗哗响，像有人在翻。\n笔尖悬着，未落。',
+  next:'finish'},
+finish:{who:'',txt:'这一卷图，你打算怎么收笔？',
+  choices:[
+    {t:'所见即所记。看不清的，留白。',set:{honest:1},next:'end'},
+    {t:'把传闻也写进去，读的人爱看。',set:{sens:1},next:'end'},
+    {t:'只画山水，不画兽。',set:{stone:1},next:'end'}
+  ]}
+};
+
+/* ---------- 引擎 ---------- */
+var f={};
+var node=null, typing=false, timer=null, full='';
+var elTxt=document.getElementById('txt'), elWho=document.getElementById('who'),
+    elDlg=document.getElementById('dlg'), elCh=document.getElementById('choices'),
+    elEnd=document.getElementById('end');
+
+function type(s){
+  full=s; typing=true; elTxt.textContent=''; var i=0;
+  clearInterval(timer);
+  timer=setInterval(function(){
+    i+=2; elTxt.textContent=s.slice(0,i);
+    if(i>=s.length){clearInterval(timer);typing=false;}
+  },18);
+}
+function show(id){
+  if(id==='end'){ending();return}
+  node=id; var n=S[id];
+  elCh.innerHTML=''; elCh.style.display='none';
+  document.getElementById('cur').style.display='block';
+  elEnd.classList.remove('on');
+  elDlg.classList.add('in'); elDlg.classList.remove('out');
+  elWho.textContent=n.who||'你';
+  elWho.style.display=n.who?'inline-block':'none';
+  type(n.txt);
+  var elQ=document.getElementById('q');
+  elQ.textContent=n.q||''; elQ.style.display=n.q?'block':'none';
+  try{localStorage.setItem('shj-node',id);localStorage.setItem('shj-f',JSON.stringify(f))}catch(e){}
+  if(n.choices){
+    n.choices.forEach(function(c){
+      var b=document.createElement('button');
+      b.className='ch'; b.textContent=c.t;
+      b.onclick=function(ev){ev.stopPropagation();pick(c)};
+      elCh.appendChild(b);
+    });
+    setTimeout(function(){
+      elCh.style.display='flex';
+      document.getElementById('cur').style.display='none';
+    },Math.min(1600,500+n.txt.length*12));
+  }
+}
+function pick(c){
+  if(c.set) for(var k in c.set) f[k]=c.set[k];
+  show(c.next);
+}
+function ending(){
+  var e;
+  if(f.stone){
+    e={tag:'第 三 种 结 局',tt:'无字之图',
+      p:'你把兽都留在了山里，素帛上只有山、水、雾，和一条不标名的路。\n后来有人翻到这卷，说画工偷懒；也有人说，这才是山真正的样子——它本不为谁作注。',
+      q:'原文：其首曰招摇之山，临于西海之上，多桂，多金玉。'};
+  }else if(f.sens){
+    e={tag:'第 二 种 结 局',tt:'伪 经',
+      p:'你把听来的都写了进去：食之不饥、佩之不迷、佩之无瘕疾，还添了几笔更好看的。\n书成之日洛阳纸贵，百年之后，有人指着这一卷说：荒诞，不可考。\n你早知道会这样。你只是想让它好卖。',
+      q:'后世评：山海经"闳诞迂夸，多奇怪俶傥之言"。'};
+  }else{
+    e={tag:'第 一 种 结 局',tt:'图 成',
+      p:(f.feed||f.still)
+        ?'狌狌后来常来。它蹲在石上看你落笔，偶尔伸手按住纸角，免得被风吹走。\n你画下的不是"其状如禺而白耳"八个字，而是一只肯替你压纸的白耳兽。所见即所记，图成，传世。'
+        :'你只记自己看清的。祝余的滋味、迷榖的花光、育沛的温度，一样没写错，也一样没写满。\n图成，不厚，不薄——够后人按图再走一遍这条路。',
+      q:'晋·郭璞注：狌狌，禺属，音如婴儿，善走。'};
+  }
+  document.getElementById('endTag').textContent=e.tag;
+  document.getElementById('endTt').textContent=e.tt;
+  document.getElementById('endP').textContent=e.p;
+  document.getElementById('endQ').textContent=e.q;
+  elDlg.classList.add('out'); elCh.style.display='none';
+  document.getElementById('chapter').classList.add('out');
+  elEnd.classList.add('on');
+}
+
+/* 点击推进 */
+document.getElementById('app').addEventListener('click',function(ev){
+  if(elEnd.classList.contains('on'))return;
+  if(document.getElementById('card').classList.contains('on'))return;
+  if(typing){clearInterval(timer);elTxt.textContent=full;typing=false;
+    if(node&&S[node].choices){elCh.style.display='flex';}
+    return;}
+  if(S[node]&&S[node].choices)return;
+  var nx=(node&&S[node].next)||null;
+  if(nx==='end'||(!nx&&node==='finish')){ending();return}
+  if(nx)show(nx);
+});
+
+/* 原文卡 */
+var card=document.getElementById('card');
+function openCard(){card.classList.add('on')}
+function closeCard(){card.classList.remove('on')}
+document.getElementById('btnSrc').onclick=function(e){e.stopPropagation();openCard()};
+document.getElementById('btnSrc2').onclick=function(e){e.stopPropagation();openCard()};
+document.getElementById('cardX').onclick=function(e){e.stopPropagation();closeCard()};
+card.addEventListener('click',function(e){if(e.target===card)closeCard()});
+
+/* 重玩 */
+document.getElementById('btnReplay').onclick=function(e){
+  e.stopPropagation(); f={};
+  try{localStorage.removeItem('shj-node');localStorage.removeItem('shj-f')}catch(err){}
+  elEnd.classList.remove('on');
+  document.getElementById('chapter').classList.remove('out');
+  show('start');
+};
+
+/* 存档续玩 */
+var saved=null;
+try{saved=localStorage.getItem('shj-node'); var sf=localStorage.getItem('shj-f');
+ if(sf)f=JSON.parse(sf);}catch(e){}
+show(saved&&S[saved]&&saved!=='finish'?saved:'start');
+</script>
+</body>
+</html>
