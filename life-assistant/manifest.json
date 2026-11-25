@@ -1,0 +1,15 @@
+{
+  "name": "今天 · 生活助手",
+  "short_name": "今天",
+  "description": "根据实时天气给出穿衣与运动建议，每天早晚提醒。",
+  "start_url": "./index.html?src=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F2F2F7",
+  "theme_color": "#F2F2F7",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
