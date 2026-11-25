@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa">
+<title>被看见 · 人才反向招聘</title>
+<style>
+:root{--acc:#2563eb;--acc2:#7c3aed;--ink:#141821;--ink2:#5a6472;--ink3:#8d97a5;--bg:#f4f6f9;--card:#fff;--line:#e5e9f0;--ok:#0f9d58;--bad:#d93025;--warn:#b26a00;--r:14px;--ez:cubic-bezier(.22,1,.36,1);--zh:-apple-system,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#e8ebf1;font-family:var(--zh);color:var(--ink);font-size:15px}
+body{display:flex;justify-content:center;min-height:100vh}
+#app{width:100%;max-width:520px;min-height:100vh;background:var(--bg);display:flex;flex-direction:column;overflow-x:hidden}
+button{font-family:inherit;color:inherit;background:none;border:0;cursor:pointer;touch-action:manipulation}
+input,select{font-family:inherit;font-size:16px}
+.hd{position:sticky;top:0;z-index:20;padding:10px 14px 9px;background:rgba(247,248,250,.9);backdrop-filter:saturate(1.5) blur(14px);border-bottom:1px solid var(--line)}
+.hd-top{display:flex;align-items:center;gap:8px}
+.hd-t{flex:1;min-width:0}
+.hd-t b{font-size:17px;font-weight:800;letter-spacing:-.2px}
+.hd-t span{display:block;font-size:11.5px;color:var(--ink3);margin-top:1px}
+.seg{display:flex;background:#e7eaf1;border-radius:11px;padding:3px;margin-top:9px}
+.seg button{flex:1;height:34px;border-radius:9px;font-size:13px;font-weight:800;color:var(--ink2)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.09)}
+.seg button.on.seeker{color:var(--acc2)}
+#view{flex:1;padding:12px 13px calc(74px + env(safe-area-inset-bottom))}
+.tabbar{position:fixed;bottom:0;left:0;right:0;margin:0 auto;max-width:520px;display:flex;background:rgba(255,255,255,.95);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:5px 4px calc(5px + env(safe-area-inset-bottom));z-index:30}
+.tabbar button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0 3px;color:var(--ink3);border-radius:11px;font-size:0}
+.tabbar b{font-size:11px;font-weight:700;letter-spacing:.4px}
+.tabbar i{font-size:19px;font-style:normal;line-height:1.15}
+.tabbar button.on{color:var(--acc)}
+.tabbar button.on.seeker{color:var(--acc2)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:0 1px 2px rgba(20,24,33,.04)}
+.sec{display:flex;align-items:center;justify-content:space-between;margin:16px 2px 7px}
+.sec h2{margin:0;font-size:12.5px;font-weight:800;letter-spacing:1px;color:var(--ink2)}
+.sec .more{font-size:12px;font-weight:700;color:var(--ink3)}
+.muted{color:var(--ink3);font-size:12.5px;line-height:1.6}
+.tag{display:inline-block;font-size:11.5px;font-weight:700;padding:3px 7px;border-radius:6px;background:#eef1f6;color:var(--ink2);margin:0 5px 5px 0}
+.tag.hit{background:#e6efff;color:#1d4ed8}
+.tag.rare{background:#f6ecff;color:#6d28d9}
+.bdg{font-size:11px;font-weight:800;padding:3px 7px;border-radius:999px;flex-shrink:0}
+.bdg.a{background:#e6f4ea;color:#0b7a45}.bdg.b{background:#eef2ff;color:#3949ab}.bdg.c{background:#f1f3f7;color:#6b7280}
+.btn{display:block;width:100%;height:46px;border-radius:11px;font-size:15px;font-weight:800;transition:transform .3s var(--ez)}
+.btn:active{transform:scale(.97)}
+.btn.pri{background:var(--acc);color:#fff;box-shadow:0 6px 14px rgba(37,99,235,.22)}
+.btn.ghost{background:#eef1f6;color:var(--ink2)}
+.btn.dark{background:var(--ink);color:#fff}
+.btn.sm{height:34px;font-size:12.5px;width:auto;display:inline-block;padding:0 11px;border-radius:9px}
+.row{display:flex;gap:7px;margin-top:11px}
+.row .btn{flex:1}
+.fld{display:block;margin-top:11px}
+.fld>span{display:block;font-size:12px;font-weight:700;color:var(--ink2);margin-bottom:5px}
+.fld input,.fld select,.fld textarea{width:100%;border:1px solid var(--line);background:#fbfcfe;border-radius:9px;padding:10px 11px;font-size:15px;outline:none}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;color:var(--ink2)}
+.chip.on{border-color:var(--acc);background:#eaf0ff;color:#1d4ed8}
+.chip.mini{padding:5px 9px;font-size:11.5px}
+/* 人才卡 */
+.tc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;margin-top:9px}
+.tc .top{display:flex;gap:10px;align-items:flex-start}
+.av{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px;background:linear-gradient(135deg,#2563eb,#7c3aed)}
+.tc .who{flex:1;min-width:0}
+.tc .nm{font-size:15.5px;font-weight:800;display:flex;align-items:center;gap:6px}
+.tc .sub{font-size:12px;color:var(--ink3);margin-top:2px}
+.score{text-align:right;flex-shrink:0}
+.score b{font-size:22px;font-weight:900;letter-spacing:-.5px;color:var(--acc);font-variant-numeric:tabular-nums}
+.score span{display:block;font-size:10.5px;color:var(--ink3)}
+.bars{margin-top:10px}
+.bar{display:flex;align-items:center;gap:7px;margin-top:5px;font-size:11.5px;color:var(--ink2)}
+.bar .l{width:52px;flex-shrink:0;color:var(--ink3)}
+.bar .t{flex:1;height:6px;background:#eef1f6;border-radius:99px;overflow:hidden}
+.bar .t i{display:block;height:100%;border-radius:99px;background:var(--acc);transition:width .5s var(--ez)}
+.bar .v{width:30px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.bar.dim .t i{background:#c9d4e8}
+.why{margin-top:9px;background:#f6f8fc;border-radius:9px;padding:9px 10px;font-size:12px;line-height:1.65;color:var(--ink2)}
+.why b{color:#1d4ed8}
+/* 权重面板 */
+.wp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.wp .hd2{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--ink2)}
+.wp .hint{font-size:11px;color:var(--ink3);margin-top:2px}
+.wrow{display:flex;align-items:center;gap:8px;margin-top:8px}
+.wrow span{width:56px;font-size:12px;color:var(--ink2);font-weight:700}
+.wrow input{flex:1;accent-color:var(--acc)}
+.wrow em{width:26px;text-align:right;font-style:normal;font-size:11.5px;color:var(--ink3)}
+/* 求职者 */
+.me-card{background:linear-gradient(160deg,#20265a,#3b2a6b 55%,#1f2440);border-radius:18px;padding:16px;color:#fff;position:relative;overflow:hidden}
+.me-card .glow{position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.55),transparent 70%)}
+.me-card .nm{font-size:21px;font-weight:900;letter-spacing:-.3px}
+.me-card .rl{font-size:12.5px;color:rgba(255,255,255,.72);margin-top:3px}
+.me-card .kpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;position:relative}
+.me-card .kpi div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.14);border-radius:11px;padding:8px 6px;text-align:center}
+.me-card .kpi b{display:block;font-size:19px;font-weight:900;font-variant-numeric:tabular-nums}
+.me-card .kpi span{font-size:10.5px;color:rgba(255,255,255,.66)}
+.sw{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:9px}
+.sw .l{font-size:13.5px;font-weight:800}
+.sw .d{font-size:11.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+.tog{width:50px;height:29px;border-radius:99px;background:#dfe4ec;position:relative;flex-shrink:0;transition:background .25s}
+.tog i{position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:left .25s var(--ez);box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.tog.on{background:var(--acc2)}
+.tog.on i{left:24px}
+.pct{height:7px;background:#eef1f6;border-radius:99px;overflow:hidden;margin-top:9px}
+.pct i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:99px}
+/* 弹层 */
+.sheet-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
+.mask{position:absolute;inset:0;background:rgba(15,18,25,.45);opacity:0;transition:opacity .25s}
+.sheet{position:relative;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;background:#fff;border-radius:20px 20px 0 0;padding:8px 15px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .32s var(--ez)}
+.sheet-wrap.in .mask{opacity:1}
+.sheet-wrap.in .sheet{transform:none}
+.sbar{width:38px;height:4px;border-radius:99px;background:#dfe3ea;margin:2px auto 10px}
+.st{font-size:17px;font-weight:800}
+.ss{font-size:12.5px;color:var(--ink3);margin-top:2px;line-height:1.55}
+.code{background:#f5f7fb;border:1px solid var(--line);border-radius:9px;padding:10px;font-size:12px;line-height:1.7;color:var(--ink2);white-space:pre-wrap;word-break:break-word}
+.toast{position:fixed;left:50%;bottom:92px;transform:translate(-50%,8px);background:rgba(19,22,28,.93);color:#fff;font-size:13px;padding:9px 15px;border-radius:9px;z-index:80;opacity:0;transition:.2s;max-width:78vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.empty{padding:26px 12px;text-align:center;color:var(--ink3);font-size:13px;line-height:1.7}
+.li{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px 12px;margin-top:8px}
+.li .r1{display:flex;align-items:center;gap:8px}
+.li .r1 .t{font-size:14.5px;font-weight:800;flex:1;min-width:0}
+.li .r2{font-size:12.5px;color:var(--ink2);margin-top:4px;line-height:1.55}
+.li .r3{font-size:11.5px;color:var(--ink3);margin-top:5px}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hd">
+    <div class="hd-top">
+      <div class="hd-t"><b id="mode-title">公司端 · 人才发现</b><span id="mode-sub">按你的岗位，从人才池里挑人</span></div>
+      <button class="btn sm ghost" id="algo">算法说明</button>
+    </div>
+    <div class="seg">
+      <button data-m="company" class="on">我是公司</button>
+      <button data-m="seeker" class="seeker">我是求职者</button>
+    </div>
+  </header>
+  <main id="view"></main>
+  <nav class="tabbar" id="tabs"></nav>
+</div>
+<script>
+'use strict';
+const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const LS='talent_v1';const now=Date.now();
+let seed=20261125;
+const rnd=()=>{seed=(seed*1103515245+12345)%2147483648;return seed/2147483648};
+const pick=a=>a[Math.floor(rnd()*a.length)];
+const money=n=>'¥'+Math.round(n)+'k';
+const DAY=864e5,ago=n=>now-n*DAY;
+const daysAgo=ts=>Math.max(0,Math.round((now-ts)/DAY));
+
+/* ---------- 数据生成 ---------- */
+const ROLE_SK={后端:['Java','Go','Spring Boot','MySQL','Redis','Kafka','微服务','K8s'],算法:['Python','PyTorch','推荐系统','特征工程','Spark','LLM','A/B实验'],前端:['React','TypeScript','Vue','Node.js','小程序','性能优化'],产品:['需求分析','数据分析','原型','B端','增长'],数据:['SQL','ETL','数仓','Hive','BI','指标口径'],测试:['自动化','Selenium','接口测试','压测','质量体系'],运维:['Linux','K8s','CI/CD','监控','安全加固'],设计:['Figma','交互','设计系统','可用性']};
+const CROSS=['英语','项目管理','带团队','开源贡献','PPT'];
+const CITIES=['北京','上海','深圳','杭州','成都','天津'];
+const SUR=['陈','林','周','吴','郑','孙','马','胡','朱','高','何','郭','罗','梁','宋','唐','许','韩','冯','邓','曹','彭','曾','萧'];
+const GIV=['嘉','然','航','宇','晨','佳','宁','洋','珊','磊','可','欣','卓','鹤','钧','茜','舟','煜','铭','琪'];
+const EDUS=['本科','硕士','本科','硕士','博士'];
+const PREV=['某互联网大厂','某银行科技部','某 SaaS 公司','某独角兽','某国企信息中心','外包团队'];
+const HI={后端:'把订单服务 P99 从 480ms 压到 120ms；带过 4 人小组',算法:'搭过召回+粗排两级链路，CTR +8.6%；线上 A/B 常年跑着',前端:'重构了埋点 SDK，包体 -42%；做过双端性能专项',产品:'从 0 到 1 做完 B 端工单系统，留存从 31% 到 58%',数据:'把 12 套口径收敛成 1 套指标字典，报表争议少了 80%',测试:'接口自动化覆盖率 78%，回归工时从 3 天压到 4 小时',运维:'K8s 迁移一次做完，故障平均恢复 26 分钟',设计:'主导设计系统落地，需求返工率降了三分之一'};
+const ROLES=Object.keys(ROLE_SK);
+function mkTalents(){
+  const out=[];
+  for(let i=0;i<26;i++){
+    const role=ROLES[i%ROLES.length], sk=ROLE_SK[role];
+    const n=3+Math.floor(rnd()*3);
+    let skills=[];
+    if(rnd()<.72)skills.push(sk[0]);
+    if(rnd()<.5&&!skills.includes(sk[1]))skills.push(sk[1]);
+    for(let k=0;k<n;k++){const s=pick(sk);if(!skills.includes(s))skills.push(s)}
+    if(rnd()<.45){const c=pick(CROSS);if(!skills.includes(c))skills.push(c);}
+    const years=1+Math.floor(rnd()*11);
+    const city=pick(CITIES);
+    const salary=Math.round(16+years*3.6+rnd()*10);
+    const st=rnd()<.55?'active':(rnd()<.7?'open':'off');
+    out.push({id:'t'+(i+1),name:SUR[i%SUR.length]+GIV[(i*3+1)%GIV.length],role,skills,years,city,salary,status:st,
+      edu:EDUS[Math.floor(rnd()*EDUS.length)],headline:HI[role],
+      lastActive:ago(Math.floor(rnd()*40)),anon:rnd()<.28,prevCo:pick(PREV),
+      openToRemote:rnd()<.3,degree:rnd()<.15?'专升本':''});
+  }
+  return out;
+}
+const JOBS=[
+  {id:'j1',co:'金城科技',title:'资深 Java 后端工程师',role:'后端',req:['Java','Spring Boot','Redis','Kafka'],years:5,maxPay:42,city:'天津'},
+  {id:'j2',co:'北辰智能',title:'推荐算法工程师',role:'算法',req:['Python','推荐系统','PyTorch','A/B实验'],years:3,maxPay:50,city:'北京'},
+  {id:'j3',co:'云栖数据',title:'数据平台工程师',role:'数据',req:['SQL','数仓','Spark','ETL'],years:4,maxPay:38,city:'杭州'},
+  {id:'j4',co:'潮汐网络',title:'高级前端工程师',role:'前端',req:['React','TypeScript','性能优化'],years:4,maxPay:36,city:'上海'},
+  {id:'j5',co:'拾光产品',title:'B 端产品经理',role:'产品',req:['需求分析','B端','数据分析','原型'],years:5,maxPay:34,city:'深圳'},
+  {id:'j6',co:'有序设计',title:'设计系统负责人',role:'设计',req:['Figma','设计系统','交互'],years:5,maxPay:32,city:'成都'}
+];
+function tailor(T){
+  JOBS.forEach((j,ji)=>{
+    const pool=T.filter(t=>t.role===j.role);
+    for(let k=0;k<4;k++){
+      const t=pool[k%pool.length];
+      const cfg=[{hit:4,city:j.city,pay:.8,yr:1,anon:false},{hit:3,city:j.city,pay:.92,yr:3,anon:true},
+                 {hit:4,city:CITIES[(ji+2)%CITIES.length],pay:.85,yr:2,anon:false},{hit:3,city:CITIES[(ji+4)%CITIES.length],pay:1.0,yr:4,anon:true}][k];
+      if(!t)continue;
+      t.skills=j.req.slice(0,cfg.hit).concat([k%2?'带团队':'数据分析']);
+      t.years=j.years+cfg.yr;
+      t.city=cfg.city;
+      t.salary=Math.round(j.maxPay*cfg.pay);
+      t.status=k<2?'active':'open';
+      t.anon=cfg.anon;
+      t.openToRemote=true;
+      t.headline=j.years+'+ 年'+t.role+'，'+j.req[0]+' 深度使用，做过从 0 到 1';
+    }
+  });
+  return T;
+}
+function firstState(){
+  const T=mkTalents();tailor(T);
+  return {ver:1,mode:'company',jobId:'j1',tab:'feed',
+    w:{skill:1,pot:.7,pay:.5,rare:.45},
+    talents:T,jobs:JOBS,events:[],invites:[],
+    me:{id:'me',name:'陈嘉',role:'后端',skills:['Java','Redis','Kafka','微服务','带团队'],years:6,city:'天津',salary:35,
+        status:'active',hidden:false,headline:'6 年后端，做过高并发订单链路，想找能带团队的机会',edu:'硕士',lastActive:now,views:0}
+  };
+}
+let S;
+try{S=JSON.parse(localStorage.getItem(LS)||'null')}catch(e){S=null}
+if(!S||!S.ver||!Array.isArray(S.talents)||!S.talents.length)S=firstState();
+['talents','jobs','events','invites'].forEach(k=>{if(!Array.isArray(S[k]))S[k]=[]});
+if(!S.w)S.w={skill:1,pot:.7,pay:.5,rare:.45};
+if(!S.me)S.me=firstState().me;
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){toast('本地存储满了')}};
+let tt=null;
+function toast(m){let el=$('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el)}el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2200)}
+
+/* ---------- 推荐算法 ---------- */
+const job=()=>S.jobs.find(j=>j.id===S.jobId)||S.jobs[0];
+let DF={};
+function idfMap(){
+  const N=S.talents.length+1;DF={};
+  S.talents.forEach(t=>t.skills.forEach(s=>DF[s]=(DF[s]||0)+1));
+  const m={};Object.keys(DF).forEach(s=>m[s]=Math.log(N/(1+DF[s])));
+  return m;
+}
+let IDF=idfMap();
+const isRare=s=>(DF[s]||0)<=2;
+const cand=j=>S.talents.filter(t=>t.status!=='off');
+function score(t,j){
+  const req=j.req,hit=req.filter(s=>t.skills.includes(s));
+  const reqW=req.reduce((a,s)=>a+(IDF[s]||.2),0);
+  const hitW=hit.reduce((a,s)=>a+(IDF[s]||.2),0);
+  const fSkill=reqW?hitW/reqW:0;
+  const yr=Math.max(0,1-Math.abs(t.years-j.years)/9);
+  const act=Math.max(.25,1-daysAgo(t.lastActive)/45);
+  const breadth=Math.min(1,t.skills.length/6);
+  const fPot=.55*yr+.3*act+.15*breadth;
+  const fPay=t.salary<=j.maxPay?1-Math.min(.35,(j.maxPay-t.salary)/j.maxPay*.6)
+                            :Math.max(0,1-(t.salary-j.maxPay)/(j.maxPay*.28));
+  const rareHits=hit.filter(s=>isRare(s));
+  const fRare=hit.length?Math.min(1,rareHits.length/Math.max(1,hit.length)*1.4):0;
+  const loc=(t.city===j.city?1:(t.openToRemote?0.78:0.42));
+  const w=S.w;
+  const wsum=w.skill+w.pot+w.pay+w.rare||1;
+  let base=(w.skill*fSkill+w.pot*fPot+w.pay*fPay+w.rare*fRare)/wsum;
+  base*=loc;
+  let fb=0,whyFb='';
+  S.events.forEach(e=>{
+    const p=S.talents.find(x=>x.id===e.tid);if(!p||p.id===t.id)return;
+    const sim=jacc(t.skills,p.skills)*.6+(p.role===t.role?.4:0);
+    if(sim<.35)return;
+    if(e.type==='invite'){fb+=.11*sim;whyFb='你之前联系过技能相近的人'}
+    if(e.type==='skip'){fb-=.09*sim}
+  });
+  fb=Math.max(-.15,Math.min(.15,fb));
+  let s=base+fb;
+  return {s:Math.max(0,Math.min(1,s)),fSkill,fPot,fPay,fRare,loc,fb,hit,rareHits,whyFb};
+}
+function jacc(a,b){const A=new Set(a),B=new Set(b);let i=0;A.forEach(x=>{if(B.has(x))i++});return i/(A.size+B.size-i||1)}
+function ranked(j,extra){
+  const arr=(j&&j.req?cand(j):[]).map(t=>({t,r:score(t,j)}));
+  (extra||[]).length;
+  return arr.sort((a,b)=>b.r.s-a.r.s);
+}
+function reasonLine(t,r,j){
+  const hits=r.hit;
+  const parts=[];
+  if(hits.length)parts.push(`命中 <b>${hits.length}/${j.req.length}</b> 项技能：${esc(hits.join('、'))}`);
+  if(r.rareHits.length)parts.push(`其中 <b>${esc(r.rareHits.join('、'))}</b> 全池只有 ${r.rareHits.map(x=>DF[x]).join('/')} 人会，供给紧、抢的人少`);
+  if(r.loc>=1)parts.push(`同城（${esc(t.city)}），可即时到岗`);
+  else if(r.loc<.5)parts.push(`异地，需要接受搬迁/远程`);
+  if(t.salary<=j.maxPay)parts.push(`期望 ${money(t.salary)} 在预算内`);
+  else parts.push(`期望 <b>${money(t.salary)}</b> 高于预算 ${money(j.maxPay)}`);
+  if(r.whyFb)parts.push(r.whyFb);
+  if(r.explore)parts.push('探索位：先看看是否合你口味');
+  return parts.join('；')+'。';
+}
+
+/* ---------- 视图 ---------- */
+function render(){
+  const m=S.mode;
+  $('#mode-title').textContent=m==='company'?'公司端 · 人才发现':'求职者端 · 我的名片';
+  $('#mode-sub').textContent=m==='company'?`当前岗位：${job().title}｜${cand(job()).length} 位候选人可看`:'让公司来挖你，不用你投简历';
+  $$('.seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
+  const tabs=m==='company'?[['feed','推荐','◈'],['filter','筛选','⌕'],['invite','邀约','✉'],['jobs','岗位','☰']]
+                          :[['card','名片','◉'],['inbox','邀约','✉'],['stats','被看见','↗']];
+  if(!tabs.some(t=>t[0]===S.tab))S.tab=tabs[0][0];
+  $('#tabs').innerHTML=tabs.map(([k,n,i])=>`<button data-t="${k}" class="${S.tab===k?'on':''} ${m==='seeker'?'seeker':''}"><i>${i}</i><b>${n}</b></button>`).join('');
+  $$('#tabs button').forEach(b=>b.onclick=()=>{S.tab=b.dataset.t;render()});
+  $$('.seg button').forEach(b=>b.onclick=()=>{S.mode=b.dataset.m;S.tab=b.dataset.m==='company'?'feed':'card';render()});
+  $('#algo').onclick=showAlgo;
+  const v=$('#view');
+  v.innerHTML=m==='company'
+    ? (S.tab==='feed'?vFeed():S.tab==='filter'?vFilter():S.tab==='invite'?vInvite():vJobs())
+    : (S.tab==='card'?vCard():S.tab==='inbox'?vInbox():vStats());
+  if(m==='company'&&S.tab==='feed')wireFeed();
+  if(m==='company'&&S.tab==='filter')wireFilter();
+  if(m==='company'&&S.tab==='invite')wireInvite();
+  if(m==='company'&&S.tab==='jobs')wireJobs();
+  if(m==='seeker'&&S.tab==='card')wireCard();
+  if(m==='seeker'&&S.tab==='inbox')wireInbox();
+}
+
+function openInvite(t){
+  const j=job();
+  const pre=`${j.co} ${j.title}，看了你的 ${t.skills.slice(0,2).join('、')} 经历很合适，想聊聊？`;
+  const w=sheet(`<div class="st">给 ${esc(t.name)} 发邀约</div>
+    <div class="ss">${esc(j.co)} · ${esc(j.title)}｜对方只看到你写的这段</div>
+    <label class="fld"><span>一句话邀约（写清岗位 + 为什么找他）</span><textarea id="msg" style="min-height:88px;line-height:1.6">${esc(pre)}</textarea></label>
+    <div class="row"><button class="btn ghost" id="x">取消</button><button class="btn pri" id="ok">发送</button></div>`);
+  w.querySelector('#x').onclick=w.close;
+  w.querySelector('#ok').onclick=()=>{
+    const msg=(w.querySelector('#msg').value||'').trim();
+    if(!msg)return toast('写一句再发');
+    S.invites.unshift({id:'i'+Date.now(),tid:t.id,tname:t.name,job:j.title,co:j.co,msg,time:now,status:'sent'});
+    S.events.push({tid:t.id,type:'invite',time:now});save();w.close();toast('已发出；技能相近的人会被优先推给你');render();
+  };
+}
+function openSkill(){
+  const w=sheet(`<div class="st">加一个技能标签</div><div class="ss">越稀缺的技能，匹配权重越高</div>
+    <label class="fld"><span>技能名</span><input id="sk" placeholder="如 Kafka / 推荐系统 / 带团队"></label>
+    <div class="row"><button class="btn ghost" id="x">取消</button><button class="btn pri" id="ok">加上</button></div>`);
+  w.querySelector('#x').onclick=w.close;
+  w.querySelector('#ok').onclick=()=>{const v=(w.querySelector('#sk').value||'').trim();if(!v)return;if(!S.me.skills.includes(v))S.me.skills.push(v);IDF=idfMap();save();w.close();render();toast('已加上 '+v)};
+}
+function vFeed(){
+  const j=job(),list=ranked(j);
+  const shown=list.slice(0,8);
+  const rest=list.slice(8,20);
+  if(rest.length){
+    const ex=rest[Math.floor(rest.length/2)];
+    shown.splice(5,0,{t:ex.t,r:Object.assign({},ex.r,{explore:true})});
+  }
+  const uniq=new Set();shown.forEach(x=>x.t.skills.forEach(s=>uniq.add(s)));
+  return `
+  <div class="wp">
+    <div class="hd2"><span>调权重，排序马上变</span><span class="more" style="font-size:11px">动一下试试</span></div>
+    <div class="hint">四个维度加权求和，再按同城与反馈修正。权重一动，第 2–4 位会换人；第 1 位通常稳——那是真契合</div>
+    ${wRow('skill','技能匹配')}${wRow('pot','成长潜力')}${wRow('pay','性价比')}${wRow('rare','稀缺度')}
+  </div>
+  <div class="sec"><h2>为你推荐 · ${esc(j.co)} ${esc(j.title)}</h2><span class="more">${list.length} 人</span></div>
+  <p class="muted" style="margin:0 2px 4px">其中 ${shown.filter(x=>x.r.hit.length===j.req.length).length} 人命中全部要求技能，共覆盖 ${uniq.size} 种技能（第 6 位是探索位，避免只推一类人）</p>
+  ${shown.map(x=>cardHtml(x.t,x.r,j,false)).join('')}`;
+}
+function wRow(k,l){
+  return `<div class="wrow"><span>${l}</span><input type="range" min="0" max="2" step="0.05" value="${S.w[k]}" data-w="${k}"><em>${S.w[k].toFixed(2)}</em></div>`;
+}
+function cardHtml(t,r,j,seekerView){
+  const st={active:['正在看机会','a'],open:['开放机会','b'],off:['暂不考虑','c']}[t.status]||['','c'];
+  const nm=seekerView||!t.anon?esc(t.name):esc(t.name[0])+'**';
+  const rare=(t.skills||[]).filter(s=>isRare(s));
+  const b=(l,v,dim)=>`<div class="bar ${dim?'dim':''}"><span class="l">${l}</span><span class="t"><i style="width:${Math.round(Math.min(1,v)*100)}%"></i></span><span class="v">${(v).toFixed(2)}</span></div>`;
+  const bars=seekerView?'':`<div class="bars">${b('技能',r.fSkill)}${b('潜力',r.fPot)}${b('性价比',r.fPay)}${b('稀缺',r.fRare)}</div>`;
+  return `<div class="tc" data-tid="${t.id}">
+    <div class="top">
+      <div class="av">${esc(t.name[0])}</div>
+      <div class="who">
+        <div class="nm">${nm}${t.anon?'<span class="bdg c">匿名中</span>':''}${t.openToRemote&&t.city!==j.city?'<span class="bdg b">可远程</span>':''}</div>
+        <div class="sub">${esc(t.role)} · ${t.years} 年 · ${esc(t.city)} · ${esc(t.edu)} · 期望 ${money(t.salary)}</div>
+      </div>
+      ${seekerView?'':`<div class="score"><b>${Math.round(r.s*100)}</b><span>匹配分 / 100</span></div>`}
+    </div>
+    <div class="chips" style="margin-top:8px">${t.skills.map(s=>`<span class="tag ${r.hit.includes(s)?'hit':''} ${rare.includes(s)?'rare':''}">${esc(s)}</span>`).join('')}</div>
+    ${bars}
+    ${seekerView?'':`<div class="why">${reasonLine(t,r,j)}</div>`}
+    <div class="row">
+      ${seekerView?'':`<button class="btn sm pri" data-act="invite" data-id="${t.id}">打招呼</button>`}
+      <button class="btn sm ghost" data-act="save" data-id="${t.id}">收藏</button>
+      ${seekerView?`<button class="btn sm ghost" data-act="prev" data-id="${t.id}">公司看到的样子</button>`:`<button class="btn sm ghost" data-act="skip" data-id="${t.id}">不合适</button>`}
+    </div>
+  </div>`;
+}
+function wireFeed(){
+  $$('[data-w]').forEach(inp=>inp.oninput=()=>{S.w[inp.dataset.w]=+inp.value;save();render()});
+  $$('[data-act]').forEach(b=>b.onclick=e=>{
+    e.stopPropagation();
+    const id=b.dataset.id,t=S.talents.find(x=>x.id===id)||S.me;
+    if(b.dataset.act==='invite'){ return openInvite(t); }
+    else if(b.dataset.act==='skip'){
+      S.events.push({tid:t.id,type:'skip',time:now});save();toast('已标记不合适，相似的人会降权');render();
+    } else {toast('已收藏（原型未做收藏页）');}
+  });
+}
+function vFilter(){
+  const j=job();
+  const city=S.fCity||'全部',minY=S.fMinY||0,maxP=S.fMaxP||60;
+  const list=ranked(j).filter(x=>(city==='全部'||x.t.city===city)&&x.t.years>=minY&&x.t.salary<=maxP);
+  return `
+  <div class="sec" style="margin-top:4px"><h2>硬条件先卡人</h2><span class="more">${list.length} 人</span></div>
+  <div class="card">
+    <label class="fld"><span>城市</span><div class="chips">${['全部','北京','上海','深圳','杭州','成都','天津'].map(c=>`<button class="chip mini ${city===c?'on':''}" data-fc="${c}">${c}</button>`).join('')}</div></label>
+    <label class="fld"><span>最低年限</span><div class="chips">${[0,3,5,8].map(y=>`<button class="chip mini ${minY===y?'on':''}" data-fy="${y}">${y?(y+' 年以上'):'不限'}</button>`).join('')}</div></label>
+    <label class="fld"><span>预算上限（期望薪资 ≤）</span><div class="chips">${[30,40,50,60].map(p=>`<button class="chip mini ${maxP===p?'on':''}" data-fp="${p}">${p}k 以内</button>`).join('')}</div></label>
+    <p class="muted" style="margin:12px 0 0">在筛选后的池子里，仍按当前权重算匹配分排序——先卡硬条件，再做软排序。</p>
+  </div>
+  ${list.length?list.slice(0,10).map(x=>cardHtml(x.t,x.r,j)).join(''):`<div class="empty">这个条件下没人了，放宽一点试试</div>`}`;
+}
+function wireFilter(){
+  $$('[data-fc]').forEach(b=>b.onclick=()=>{S.fCity=b.dataset.fc;render()});
+  $$('[data-fy]').forEach(b=>b.onclick=()=>{S.fMinY=+b.dataset.fy;render()});
+  $$('[data-fp]').forEach(b=>b.onclick=()=>{S.fMaxP=+b.dataset.fp;render()});
+  $$('[data-act]').forEach(b=>b.onclick=e=>{e.stopPropagation();const t=S.talents.find(x=>x.id===b.dataset.id);if(!t)return;
+    if(b.dataset.act==='invite'){return openInvite(t)}
+    else if(b.dataset.act==='skip'){S.events.push({tid:t.id,type:'skip',time:now});save();render()}
+    else toast('已收藏')});
+}
+function vInvite(){
+  const list=S.invites.slice(0,20);
+  return `<div class="sec" style="margin-top:4px"><h2>我发出的邀约</h2><span class="more">${S.invites.length} 条</span></div>
+  ${list.length?list.map(i=>`<div class="li">
+    <div class="r1"><span class="t">${esc(i.tname)}</span><span class="bdg ${i.status==='accepted'?'a':i.status==='declined'?'c':'b'}">${i.status==='accepted'?'已接受':i.status==='declined'?'已婉拒':'等待回复'}</span></div>
+    <div class="r2">${esc(i.co)} · ${esc(i.job)}</div>
+    <div class="r2" style="color:var(--ink3)">“${esc(i.msg)}”</div>
+    <div class="r3">${Math.max(0,Math.round((now-i.time)/3600e3))} 小时前</div>
+  </div>`).join(''):`<div class="empty">还没发过邀约。<br>去「推荐」里看人，合适的点「打招呼」。</div>`}`;
+}
+function wireInvite(){}
+function vJobs(){
+  return `<div class="sec" style="margin-top:4px"><h2>我的开放岗位</h2><span class="more">点一个换着看人</span></div>
+  ${S.jobs.map(j=>{
+    const n=ranked(j).length,on=j.id===S.jobId;
+    return `<div class="li" data-j="${j.id}" style="${on?'border-color:#2563eb;background:#f7f9ff':''}">
+      <div class="r1"><span class="t">${esc(j.title)}</span>${on?'<span class="bdg b">当前</span>':'<span class="bdg c">'+n+' 人入库</span>'}</div>
+      <div class="r2">${esc(j.co)} · ${esc(j.city)} · ${j.years} 年以上 · 预算 ${money(j.maxPay)}</div>
+      <div class="chips" style="margin-top:6px">${j.req.map(s=>`<span class="tag">${esc(s)}</span>`).join('')}</div>
+    </div>`;
+  }).join('')}
+  <p class="muted" style="margin:14px 2px 0">原型里岗位是预置的；真实产品里 HR 填 JD 后，系统自动把全池人才重算一遍，并推送「今天新进入视野的 8 位」。</p>`;
+}
+function wireJobs(){$$('[data-j]').forEach(el=>el.onclick=()=>{S.jobId=el.dataset.j;S.tab='feed';save();render()})}
+
+function vCard(){
+  const m=S.me;
+  const j=S.jobs.map(j=>({j,s:score(m,j).s})).sort((a,b)=>b.s-a.s).slice(0,2);
+  return `
+  <div class="me-card">
+    <div class="glow"></div>
+    <div class="nm">${esc(m.name)} ${m.hidden?'<span class="bdg c">隐身中</span>':''}</div>
+    <div class="rl">${esc(m.role)} · ${m.years} 年 · ${esc(m.city)} · 期望 ${money(m.salary)}</div>
+    <div class="kpi">
+      <div><b>${10+S.invites.length*3}</b><span>本周被查看</span></div>
+      <div><b>${S.jobs.length}</b><span>匹配岗位</span></div>
+      <div><b>${S.invites.length}</b><span>收到邀约</span></div>
+    </div>
+  </div>
+  <div class="sw"><div><div class="l">正在看机会</div><div class="d">打开后，公司的人才池里能优先看到你</div></div><div class="tog ${m.status==='active'?'on':''}" id="t-open"><i></i></div></div>
+  <div class="sw"><div><div class="l">对现雇主隐身</div><div class="d">${m.hidden?'现在公司看到的是「'+m.name[0]+'** · 某公司后端」':'建议打开：现公司 HR 在平台上也搜得到你'}</div></div><div class="tog ${m.hidden?'on':''}" id="t-hide"><i></i></div></div>
+  <div class="sec"><h2>我的技能标签</h2><span class="more">${m.skills.length} 个</span></div>
+  <div class="chips">${m.skills.map(s=>`<span class="tag hit">${esc(s)}</span>`).join('')}<button class="chip mini" id="add-sk">+ 加技能</button></div>
+  <div class="sec"><h2>名片完整度</h2><span class="more">${m.skills.length>=5?'很好':'还能更好'}</span></div>
+  <div class="card"><div class="pct"><i style="width:${Math.min(100,40+m.skills.length*10)}%"></i></div>
+  <p class="muted" style="margin:8px 0 0">${m.headline}</p></div>
+  <div class="sec"><h2>最可能找你的公司</h2><span class="more">按你名片算的</span></div>
+  ${j.map((x,i)=>`<div class="li"><div class="r1"><span class="t">${esc(x.j.co)}</span><span class="bdg ${i===0?'b':''}">${Math.round(x.s*100)} 分匹配</span></div>
+    <div class="r2">${esc(x.j.title)} · ${esc(x.j.city)} · ${money(x.j.maxPay)}</div></div>`).join('')}
+  <p class="muted" style="margin:14px 2px 0">反向招聘的核心：你只维护名片，系统持续把你推到“正在找这类人”的公司，而不是你去海投。</p>`;
+}
+function wireCard(){
+  $('#t-open').onclick=()=>{S.me.status=S.me.status==='active'?'open':'active';save();render()};
+  $('#t-hide').onclick=()=>{S.me.hidden=!S.me.hidden;save();toast(S.me.hidden?'已隐身，现雇主搜不到你':'已取消隐身');render()};
+  $('#add-sk').onclick=openSkill;
+}
+function vInbox(){
+  return `<div class="sec" style="margin-top:4px"><h2>公司来找你了</h2><span class="more">${S.invites.length} 条</span></div>
+  ${S.invites.length?S.invites.slice(0,20).map(i=>`<div class="li">
+    <div class="r1"><span class="t">${esc(i.co)}</span><span class="bdg ${i.status==='accepted'?'a':i.status==='declined'?'c':'b'}">${i.status==='accepted'?'已接受':i.status==='declined'?'已婉拒':'待回复'}</span></div>
+    <div class="r2">${esc(i.job)}</div>
+    <div class="r2" style="color:var(--ink3)">“${esc(i.msg)}”</div>
+    <div class="row"><button class="btn sm pri" data-acc="${i.id}">聊一聊</button><button class="btn sm ghost" data-dec="${i.id}">婉拒</button></div>
+  </div>`).join(''):`<div class="empty">还没有公司找你。<br>把「正在看机会」打开、技能补全，曝光会明显上升。</div>`}
+  <p class="muted" style="margin:14px 2px 0">对方只能看到你愿意公开的信息；隐身状态下显示「姓+** · 某公司后端」。</p>`;
+}
+function wireInbox(){
+  $$('[data-acc]').forEach(b=>b.onclick=()=>{const i=S.invites.find(x=>x.id===b.dataset.acc);i.status='accepted';save();toast('已接受，对方会收到你的联系方式');render()});
+  $$('[data-dec]').forEach(b=>b.onclick=()=>{const i=S.invites.find(x=>x.id===b.dataset.dec);i.status='declined';save();render()});
+}
+function vStats(){
+  const m=S.me;
+  const best=S.jobs.map(j=>({j,r:score(m,j)})).sort((a,b)=>b.r.s-a.r.s)[0];
+  const bj=best.j;const myR=best.r;
+  const all=S.talents.map(t=>({t,r:score(t,bj)}));
+  const better=all.filter(x=>x.r.s>myR.s).length;
+  const pct=Math.min(96,Math.round((1-better/(all.length+1))*100));
+  const rare=IDF;const myRare=m.skills.map(s=>[s,(rare[s]||0)]).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  return `<div class="card" style="text-align:center">
+    <div class="muted">在「${esc(bj.co)} ${esc(bj.title)}」这一岗位的候选池里（你最匹配的岗位）</div>
+    <div style="font-size:30px;font-weight:900;letter-spacing:-1px;margin-top:6px">优于 ${pct}%</div>
+    <div class="muted" style="margin-top:4px">匹配分 ${Math.round(myR.s*100)} · 池子 ${all.length+1} 人</div>
+    <div class="bars" style="margin-top:12px;text-align:left">
+      ${[['技能',myR.fSkill],['潜力',myR.fPot],['性价比',myR.fPay],['稀缺',myR.fRare]].map(([l,v])=>`<div class="bar"><span class="l">${l}</span><span class="t"><i style="width:${Math.round(Math.min(1,v)*100)}%"></i></span><span class="v">${v.toFixed(2)}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="sec"><h2>技能的市场供给</h2><span class="more">全池 ${all.length+1} 人</span></div>
+  <div class="card">${myRare.map(([s])=>{const d=DF[s]||0;const txt=d<=2?'供给很紧，抢的人少，这是你最容易被打招呼的技能':d<=6?'属于偏窄技能，招聘方会当成加分项':'常规要求技能，几乎人人都有，加分有限';
+    return `<div class="li"<div class="r1"><span class="t">${esc(s)}</span><span class="bdg ${d<=2?'b':'c'}">${d} 人会</span></div>
+    <div class="r2">${txt}</div></div>`}).join('')}</div>
+  <div class="sec"><h2>提曝光的三件事</h2></div>
+  <div class="card"><div class="muted" style="line-height:2">1. 打开「正在看机会」，曝光权重 +30%<br>2. 补到 5 个以上技能标签，命中率明显上升<br>3. 期望薪资设成区间而不是单点（原型里简化成单值）</div></div>`;
+}
+
+/* 算法说明 */
+function showAlgo(){
+  const w=S.w,j=job();
+  const txt=`匹配分 = ( w技能·技能匹配 + w潜力·成长潜力 + w性价比·性价比 + w稀缺·技能稀缺 ) / Σw  × 地点系数 + 反馈修正
+
+当前权重：技能 ${w.skill.toFixed(2)} / 潜力 ${w.pot.toFixed(2)} / 性价比 ${w.pay.toFixed(2)} / 稀缺 ${w.wit||w.rare}
+
+① 技能匹配：Σ(命中技能的 IDF) / Σ(岗位要求技能的 IDF)
+   IDF = ln(总人数 / (1+会这项的人数))，越稀缺的技能权重越高
+
+② 成长潜力 = 0.55×年限贴合 + 0.30×活跃度 + 0.15×技能广度
+   年限贴合按 |候选人年限 - 岗位要求年限| 线性衰减；活跃度按最近登录天数衰减（45 天为底）
+
+③ 性价比：期望 ≤ 预算时接近 1，略低于预算再小幅加分；超预算按差额比例扣分（不是一刀切排除）
+
+④ 稀缺度：命中技能里，有多少项全池只有 ≤2 人会（真供给紧才加分，不是越冷门越值钱）
+
+⑤ 地点系数：同城 1.0；接受远程 0.78；异地 0.42（异地不是排除，是打折）
+
+⑥ 反馈修正（±0.15）：你打过招呼的人，技能相似的新候选人 +0.11×相似度；你标「不合适」的同类 -0.09×相似度
+
+⑦ 探索位：排序完从第 9–20 名抽 1 位插到第 6 位并标注，不参与打分——避免池子越推越窄
+
+当前岗位：${j.co} ${j.title}，要求 ${j.req.join('、')}；预算 ${money(j.maxPay)}，${j.city}，${j.years} 年以上`;
+  const sw=sheet(`<div class="st">推荐算法怎么算的</div><div class="ss">每一步都能对 HR 解释，不是黑箱</div>
+    <div class="code" style="margin-top:12px">${esc(txt)}</div>
+    <div class="row"><button class="btn ghost" id="x">知道了</button><button class="btn pri" id="r">重置权重</button></div>`);
+  sw.querySelector('#x').onclick=sw.close;
+  sw.querySelector('#r').onclick=()=>{S.w={skill:1,pot:.7,pay:.5,rare:.45};save();sw.close();render();toast('权重已重置')};
+}
+function sheet(html){
+  const wrap=document.createElement('div');wrap.className='sheet-wrap';
+  wrap.innerHTML=`<div class="mask"></div><div class="sheet"><div class="sbar"></div>${html}</div>`;
+  document.body.appendChild(wrap);requestAnimationFrame(()=>wrap.classList.add('in'));
+  const close=()=>{wrap.classList.remove('in');setTimeout(()=>wrap.remove(),280)};
+  wrap.close=close;wrap.querySelector('.mask').onclick=close;return wrap;
+}
+window.__TA={get state(){return S},score,ranked,idf:()=>IDF,df:()=>DF};
+render();
+</script>
+</body>
+</html>
