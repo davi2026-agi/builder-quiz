@@ -1,0 +1,15 @@
+{
+  "name": "工地小管家 · 小建筑公司项目管理",
+  "short_name": "工地小管家",
+  "description": "施工日志、材料台账、安全巡检、班组考勤，手机上两下录完。",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f5f7",
+  "theme_color": "#ff6a13",
+  "lang": "zh-CN",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "../apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "maskable" }
+  ]
+}
