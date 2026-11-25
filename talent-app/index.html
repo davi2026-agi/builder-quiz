@@ -54,7 +54,6 @@ input,select{font-family:inherit;font-size:16px}
 .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:700;color:var(--ink2)}
 .chip.on{border-color:var(--acc);background:#eaf0ff;color:#1d4ed8}
 .chip.mini{padding:5px 9px;font-size:11.5px}
-/* 人才卡 */
 .tc{background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px;margin-top:9px}
 .tc .top{display:flex;gap:10px;align-items:flex-start}
 .av{width:42px;height:42px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:15px;background:linear-gradient(135deg,#2563eb,#7c3aed)}
@@ -73,7 +72,6 @@ input,select{font-family:inherit;font-size:16px}
 .bar.dim .t i{background:#c9d4e8}
 .why{margin-top:9px;background:#f6f8fc;border-radius:9px;padding:9px 10px;font-size:12px;line-height:1.65;color:var(--ink2)}
 .why b{color:#1d4ed8}
-/* 权重面板 */
 .wp{background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px}
 .wp .hd2{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;font-weight:800;color:var(--ink2)}
 .wp .hint{font-size:11px;color:var(--ink3);margin-top:2px}
@@ -81,7 +79,6 @@ input,select{font-family:inherit;font-size:16px}
 .wrow span{width:56px;font-size:12px;color:var(--ink2);font-weight:700}
 .wrow input{flex:1;accent-color:var(--acc)}
 .wrow em{width:26px;text-align:right;font-style:normal;font-size:11.5px;color:var(--ink3)}
-/* 求职者 */
 .me-card{background:linear-gradient(160deg,#20265a,#3b2a6b 55%,#1f2440);border-radius:18px;padding:16px;color:#fff;position:relative;overflow:hidden}
 .me-card .glow{position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.55),transparent 70%)}
 .me-card .nm{font-size:21px;font-weight:900;letter-spacing:-.3px}
@@ -99,7 +96,6 @@ input,select{font-family:inherit;font-size:16px}
 .tog.on i{left:24px}
 .pct{height:7px;background:#eef1f6;border-radius:99px;overflow:hidden;margin-top:9px}
 .pct i{display:block;height:100%;background:linear-gradient(90deg,#2563eb,#7c3aed);border-radius:99px}
-/* 弹层 */
 .sheet-wrap{position:fixed;inset:0;z-index:60;display:flex;align-items:flex-end;justify-content:center}
 .mask{position:absolute;inset:0;background:rgba(15,18,25,.45);opacity:0;transition:opacity .25s}
 .sheet{position:relative;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;background:#fff;border-radius:20px 20px 0 0;padding:8px 15px calc(18px + env(safe-area-inset-bottom));transform:translateY(100%);transition:transform .32s var(--ez)}
@@ -145,8 +141,6 @@ const pick=a=>a[Math.floor(rnd()*a.length)];
 const money=n=>'¥'+Math.round(n)+'k';
 const DAY=864e5,ago=n=>now-n*DAY;
 const daysAgo=ts=>Math.max(0,Math.round((now-ts)/DAY));
-
-/* ---------- 数据生成 ---------- */
 const ROLE_SK={后端:['Java','Go','Spring Boot','MySQL','Redis','Kafka','微服务','K8s'],算法:['Python','PyTorch','推荐系统','特征工程','Spark','LLM','A/B实验'],前端:['React','TypeScript','Vue','Node.js','小程序','性能优化'],产品:['需求分析','数据分析','原型','B端','增长'],数据:['SQL','ETL','数仓','Hive','BI','指标口径'],测试:['自动化','Selenium','接口测试','压测','质量体系'],运维:['Linux','K8s','CI/CD','监控','安全加固'],设计:['Figma','交互','设计系统','可用性']};
 const CROSS=['英语','项目管理','带团队','开源贡献','PPT'];
 const CITIES=['北京','上海','深圳','杭州','成都','天津'];
@@ -223,8 +217,6 @@ if(!S.me)S.me=firstState().me;
 const save=()=>{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){toast('本地存储满了')}};
 let tt=null;
 function toast(m){let el=$('.toast');if(!el){el=document.createElement('div');el.className='toast';document.body.appendChild(el)}el.textContent=m;el.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('on'),2200)}
-
-/* ---------- 推荐算法 ---------- */
 const job=()=>S.jobs.find(j=>j.id===S.jobId)||S.jobs[0];
 let DF={};
 function idfMap(){
@@ -285,8 +277,6 @@ function reasonLine(t,r,j){
   if(r.explore)parts.push('探索位：先看看是否合你口味');
   return parts.join('；')+'。';
 }
-
-/* ---------- 视图 ---------- */
 function render(){
   const m=S.mode;
   $('#mode-title').textContent=m==='company'?'公司端 · 人才发现':'求职者端 · 我的名片';
@@ -310,7 +300,6 @@ function render(){
   if(m==='seeker'&&S.tab==='card')wireCard();
   if(m==='seeker'&&S.tab==='inbox')wireInbox();
 }
-
 function openInvite(t){
   const j=job();
   const pre=`${j.co} ${j.title}，看了你的 ${t.skills.slice(0,2).join('、')} 经历很合适，想聊聊？`;
@@ -356,7 +345,6 @@ function wRow(k,l){
   return `<div class="wrow"><span>${l}</span><input type="range" min="0" max="2" step="0.05" value="${S.w[k]}" data-w="${k}"><em>${S.w[k].toFixed(2)}</em></div>`;
 }
 function cardHtml(t,r,j,seekerView){
-  const st={active:['正在看机会','a'],open:['开放机会','b'],off:['暂不考虑','c']}[t.status]||['','c'];
   const nm=seekerView||!t.anon?esc(t.name):esc(t.name[0])+'**';
   const rare=(t.skills||[]).filter(s=>isRare(s));
   const b=(l,v,dim)=>`<div class="bar ${dim?'dim':''}"><span class="l">${l}</span><span class="t"><i style="width:${Math.round(Math.min(1,v)*100)}%"></i></span><span class="v">${(v).toFixed(2)}</span></div>`;
@@ -438,7 +426,6 @@ function vJobs(){
   <p class="muted" style="margin:14px 2px 0">原型里岗位是预置的；真实产品里 HR 填 JD 后，系统自动把全池人才重算一遍，并推送「今天新进入视野的 8 位」。</p>`;
 }
 function wireJobs(){$$('[data-j]').forEach(el=>el.onclick=()=>{S.jobId=el.dataset.j;S.tab='feed';save();render()})}
-
 function vCard(){
   const m=S.me;
   const j=S.jobs.map(j=>({j,s:score(m,j).s})).sort((a,b)=>b.s-a.s).slice(0,2);
@@ -502,21 +489,19 @@ function vStats(){
   </div>
   <div class="sec"><h2>技能的市场供给</h2><span class="more">全池 ${all.length+1} 人</span></div>
   <div class="card">${myRare.map(([s])=>{const d=DF[s]||0;const txt=d<=2?'供给很紧，抢的人少，这是你最容易被打招呼的技能':d<=6?'属于偏窄技能，招聘方会当成加分项':'常规要求技能，几乎人人都有，加分有限';
-    return `<div class="li"<div class="r1"><span class="t">${esc(s)}</span><span class="bdg ${d<=2?'b':'c'}">${d} 人会</span></div>
+    return `<div class="li" style="margin-top:6px"><div class="r1"><span class="t">${esc(s)}</span><span class="bdg ${d<=2?'b':'c'}">${d} 人会</span></div>
     <div class="r2">${txt}</div></div>`}).join('')}</div>
   <div class="sec"><h2>提曝光的三件事</h2></div>
   <div class="card"><div class="muted" style="line-height:2">1. 打开「正在看机会」，曝光权重 +30%<br>2. 补到 5 个以上技能标签，命中率明显上升<br>3. 期望薪资设成区间而不是单点（原型里简化成单值）</div></div>`;
 }
-
-/* 算法说明 */
 function showAlgo(){
   const w=S.w,j=job();
   const txt=`匹配分 = ( w技能·技能匹配 + w潜力·成长潜力 + w性价比·性价比 + w稀缺·技能稀缺 ) / Σw  × 地点系数 + 反馈修正
 
-当前权重：技能 ${w.skill.toFixed(2)} / 潜力 ${w.pot.toFixed(2)} / 性价比 ${w.pay.toFixed(2)} / 稀缺 ${w.wit||w.rare}
+当前权重：技能 ${w.skill.toFixed(2)} / 潜力 ${w.pot.toFixed(2)} / 性价比 ${w.pay.toFixed(2)} / 稀缺 ${w.rare.toFixed(2)}
 
 ① 技能匹配：Σ(命中技能的 IDF) / Σ(岗位要求技能的 IDF)
-   IDF = ln(总人数 / (1+会这项的人数))，越稀缺的技能权重越高
+   IDF = ln(总人数 / (1+会这项的人数))，越稀缺的技能权重越高——所以「会 Kafka 的人少」比「会 Java 的人多」更值钱
 
 ② 成长潜力 = 0.55×年限贴合 + 0.30×活跃度 + 0.15×技能广度
    年限贴合按 |候选人年限 - 岗位要求年限| 线性衰减；活跃度按最近登录天数衰减（45 天为底）
@@ -528,6 +513,7 @@ function showAlgo(){
 ⑤ 地点系数：同城 1.0；接受远程 0.78；异地 0.42（异地不是排除，是打折）
 
 ⑥ 反馈修正（±0.15）：你打过招呼的人，技能相似的新候选人 +0.11×相似度；你标「不合适」的同类 -0.09×相似度
+   —— 这就是最朴素的在线学习，用得越久越像“你的口味”
 
 ⑦ 探索位：排序完从第 9–20 名抽 1 位插到第 6 位并标注，不参与打分——避免池子越推越窄
 
