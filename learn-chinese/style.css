@@ -25,7 +25,7 @@ body { min-height: 100vh; display: flex; justify-content: center; }
 button { font-family: inherit; cursor: pointer; border: none; background: none; color: inherit; touch-action: manipulation; }
 b { font-weight: 800; }
 
-/* 统一交互反馈：按下快速缩小，松手弹簧回弹 */
+/* 统一交互反馈：按下轻微缩小，松手弹簧回弹 */
 .game, .opt, .tok, .next, .again, .check, .bigplay, .speak, .back, .ghost, .undo, .zi {
   transition: transform .4s var(--ease-spring), opacity .3s ease, background-color .3s var(--ease-out), border-color .3s var(--ease-out), box-shadow .4s var(--ease-out), color .2s ease;
 }
@@ -129,6 +129,13 @@ b { font-weight: 800; }
 .bigplay { position: relative; width: 92px; height: 92px; border-radius: 50%; background: var(--red); color: #fff; font-size: 36px; margin: 8px auto 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(215,38,61,.3); }
 .autoplay { font-size: 12px; color: var(--ink-2); margin-top: 10px; }
 .autoplay button { color: var(--red); font-weight: 700; text-decoration: underline; font-size: 12px; }
+
+.audio-bar { width: 100%; margin: 0 0 6px; height: 48px; border-radius: 16px; background: #fff; border: 1px solid var(--line); font-size: 15px; font-weight: 800; color: var(--ink); display: flex; align-items: center; justify-content: center; gap: 8px; transition: transform .4s var(--ease-spring), background-color .3s var(--ease-out), border-color .3s var(--ease-out); }
+.audio-bar:active { transform: scale(.955); transition-duration: .12s; }
+.audio-bar.ok { background: #e6f6f3; border-color: #9edfd6; color: var(--jade); }
+.audio-note { display: none; text-align: center; font-size: 12.5px; color: var(--ink-2); line-height: 1.5; margin: 0 0 14px; padding: 0 10px; }
+.audio-note.show { display: block; animation: rise .4s var(--ease-out) both; }
+.bigplay.small { width: 52px; height: 52px; font-size: 22px; margin: 12px auto 0; box-shadow: 0 6px 16px rgba(215,38,61,.25); }
 
 .opts { display: flex; flex-direction: column; gap: 10px; }
 .opts.two { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
