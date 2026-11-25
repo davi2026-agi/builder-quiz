@@ -71,25 +71,55 @@
   const sample = (arr, n) => shuffle(arr).slice(0, n);
   const other = (arr, n, not) => sample(arr.filter(x => x !== not), n);
   const esc = (s) => String(s).replace(/[&<>\"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  let zhVoice = null;
-  function pickVoice() {
-    const vs = speechSynthesis.getVoices();
-    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+  let zhVoice = null, audioUnlocked = false;
+  const ttsOk = 'speechSynthesis' in window;
+  function refreshVoices() {
+    if (!ttsOk) return [];
+    const vs = speechSynthesis.getVoices() || [];
+    zhVoice = vs.find(v => /zh[-_]CN/i.test(v.lang)) || vs.find(v => /zh[-_]HK|zh[-_]TW|yue/i.test(v.lang)) || vs.find(v => /^zh/i.test(v.lang)) || null;
+    return vs;
+  }
+  function unlockAudio() {
+    if (!ttsOk) return false;
+    refreshVoices();
+    try { speechSynthesis.resume(); } catch (e) {}
+    audioUnlocked = true;
+    return true;
+  }
+  function flashHint(msg) {
+    let box = document.getElementById('audio-note');
+    if (!box) {
+      box = document.createElement('div'); box.id = 'audio-note'; box.className = 'audio-note';
+      const sc = document.querySelector('#screen'); if (sc) sc.appendChild(box);
+    }
+    box.textContent = '🔊 ' + msg;
+    box.classList.add('show');
+    clearTimeout(box._t); box._t = setTimeout(() => box.classList.remove('show'), 3600);
   }
   function speak(text, rate, el) {
-    if (!('speechSynthesis' in window)) return;
-    pickVoice();
+    if (!ttsOk) { flashHint('This browser doesn’t support speech audio.'); return; }
+    unlockAudio();
+    refreshVoices();
+    if (!zhVoice) { flashHint('No Mandarin voice found — add Chinese voice in your phone’s system settings.'); return; }
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'zh-CN'; if (zhVoice) u.voice = zhVoice;
-    u.rate = rate || 0.75;
+    u.lang = 'zh-CN';
+    try { u.voice = zhVoice; } catch (e) {}
+    u.rate = rate || 0.75; u.pitch = 1;
     const stop = () => { if (el) el.classList.remove('speaking'); };
     u.onstart = () => { if (el) el.classList.add('speaking'); };
-    u.onend = stop; u.onerror = stop;
+    u.onend = stop;
+    u.onerror = (ev) => { stop(); flashHint(ev && ev.error === 'not-allowed' ? 'Tap 🔊 Enable audio first' : 'Voice unavailable right now.'); };
     speechSynthesis.cancel();
     stop();
     speechSynthesis.speak(u);
   }
-  if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = pickVoice;
+  if (ttsOk) {
+    refreshVoices();
+    speechSynthesis.onvoiceschanged = refreshVoices;
+    // iOS / Chrome：必须在用户手势里解锁一次音频
+    document.addEventListener('pointerdown', unlockAudio, { once: true });
+    document.addEventListener('touchend', unlockAudio, { once: true });
+  }
 
   function confetti() {
     const colors = ['#d7263d', '#f2b531', '#1b998b', '#2e86de', '#7b4cb3'];
@@ -114,6 +144,12 @@
     const reviewHtml = review.length
       ? review.map(k => { const [zh, en] = k.split('|'); return `<span class="chip"><span class="zh">${esc(zh)}</span><span class="en">${esc(en)}</span></span>`; }).join('')
       : '<span class="muted">Nothing yet. Miss a word and it lands here for review.</span>';
+    refreshVoices();
+    const voiceOk = ttsOk && !!zhVoice;
+    const audioBar = ttsOk
+      ? `<button class="audio-bar ${voiceOk ? 'ok' : ''}" id="audio-enable">🔊 <span>${voiceOk ? 'Sound on' : 'Tap to enable sound'}</span></button>
+         <div class="audio-note ${voiceOk ? '' : 'show'}">${voiceOk ? '' : 'Hear no voice? Download the Mandarin (Chinese) voice in your phone’s system settings first.'}</div>`
+      : `<div class="audio-note show">This browser doesn’t support speech audio.</div>`;
     const html = `
       <div class="screen-in">
         <div class="hero">
@@ -129,6 +165,7 @@
           </div>
           <button class="speak" id="wotd-spk" aria-label="hear it">🔊</button>
         </div>
+        ${audioBar}
         <div class="games">
           <button class="game c1" data-g="tone"><div class="ic">声</div><div class="n">Tone Trainer</div><div class="d">mā? má? mǎ? Hear the difference.</div><div class="go">▶</div></button>
           <button class="game c2" data-g="meaning"><div class="ic">词</div><div class="n">Word Match</div><div class="d">95 core words, meanings by feel.</div><div class="go">▶</div></button>
@@ -147,6 +184,17 @@
     setScreen(html, mode === 'fwd' ? 'fwd' : 'back');
     $('#wotd-spk').onclick = () => speak(w.h, 0.75, $('#wotd-spk'));
     $('#wotd-z').onclick = () => speak(w.h, 0.75, $('#wotd-spk'));
+    const ab = $('#audio-enable');
+    if (ab) ab.onclick = () => {
+      unlockAudio(); refreshVoices();
+      if (zhVoice) {
+        ab.classList.add('ok');
+        const sp = ab.querySelector('span'); if (sp) sp.textContent = 'Sound on';
+        speak(w.h, 0.75, ab);
+      } else {
+        flashHint('No Mandarin voice found — add Chinese voice in your phone’s system settings.');
+      }
+    };
     document.querySelectorAll('.game').forEach(b => b.onclick = () => startGame(b.dataset.g));
   }
 
@@ -213,7 +261,7 @@
     const q = G.qs[G.i];
     let html = head(TITLES[G.type]) + '<div class="screen-in">';
     if (q.kind === 'sentence') {
-      html += `<div class="prompt"><div class="k">Tap the bricks in order</div><div class="hint">${esc(q.sentence.e)}</div></div>
+      html += `<div class="prompt"><div class="k">Tap the bricks in order</div><div class="hint">${esc(q.sentence.e)}</div><button class="bigplay small" id="sent-spk" aria-label="hear sentence">🔊</button></div>
         <div class="slots" id="slots"><span class="ph">your sentence…</span></div>
         <div class="bank" id="bank">${shuffle(q.sentence.w.concat(sample(['吗', '很', '不', '我', '你', '的', '了'], 2).filter(x => !q.sentence.w.includes(x)))).map(t => `<button class="tok" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>
         <button class="check" id="check" disabled>Check</button><button class="undo" id="undo">Undo last</button><div id="fx"></div>`;
@@ -235,7 +283,6 @@
       const go = () => speak(q.prompt.speak, 0.75, $('#play') || $('#spk'));
       const pb = $('#play'); if (pb) pb.onclick = go;
       const sb = $('#spk'); if (sb) sb.onclick = go;
-      go(); // 进入题目自动朗读
     }
     document.querySelectorAll('.opt').forEach(b => b.onclick = () => choose(q, Number(b.dataset.i), b));
   }
@@ -295,6 +342,8 @@
   function wireSentence(q) {
     const picked = [];
     const slots = $('#slots'), bank = $('#bank'), check = $('#check');
+    const sspk = $('#sent-spk');
+    if (sspk) sspk.onclick = () => speak(q.sentence.h, 0.8, sspk);
     const redraw = () => {
       slots.innerHTML = picked.length ? picked.map(t => `<span class="tok">${esc(t)}</span>`).join('') : '<span class="ph">your sentence…</span>';
       check.disabled = picked.length === 0;
