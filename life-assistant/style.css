@@ -1,0 +1,101 @@
+:root{
+  --bg:#F2F2F7; --card:#FFFFFF; --card2:#FFFFFF; --ink:#000; --ink2:#3C3C4399; --ink3:#3C3C434D;
+  --sep:#3C3C4326; --blue:#007AFF; --green:#34C759; --orange:#FF9500; --red:#FF3B30;
+  --fill:#7676801F; --radius:14px;
+}
+@media (prefers-color-scheme:dark){
+  .tog{background:#39393D}
+  :root{ --bg:#000; --card:#1C1C1E; --card2:#2C2C2E; --ink:#FFF; --ink2:#EBEBF599; --ink3:#EBEBF54D;
+    --sep:#54545899; --fill:#7676803D; --blue:#0A84FF; --green:#30D158; --orange:#FF9F0A; --red:#FF453A;}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue",system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;font-size:17px;line-height:1.4}
+body{padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.wrap{max-width:520px;margin:0 auto;padding:0 0 0}
+
+.nav{position:sticky;top:0;z-index:9;display:flex;align-items:center;justify-content:space-between;
+  padding:calc(8px + env(safe-area-inset-top)) 16px 8px;
+  background:color-mix(in srgb, var(--bg) 93%, transparent);backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:.5px solid var(--sep)}
+.nav .t{font-size:17px;font-weight:600;letter-spacing:-.2px}
+.nav button{background:none;border:0;color:var(--blue);font-size:17px;padding:6px 0;font-family:inherit}
+.lt{padding:12px 20px 4px}
+.lt h1{margin:0;font-size:34px;font-weight:700;letter-spacing:-.6px}
+.lt p{margin:4px 0 0;color:var(--ink2);font-size:15px}
+
+.hero{margin:12px 16px 0;border-radius:20px;padding:20px;color:#fff;position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#2E7CF6 0%,#5AA9FF 46%,#8FD0FF 100%)}
+.hero.night{background:linear-gradient(160deg,#1B2A5B 0%,#2D3E77 55%,#4A5EA8 100%)}
+.hero .city{font-size:15px;opacity:.9;display:flex;align-items:center;gap:6px}
+.hero .deg{font-size:64px;font-weight:200;letter-spacing:-3px;line-height:1.05;margin-top:2px}
+.hero .deg sup{font-size:26px;vertical-align:top;font-weight:300;top:.55em;position:relative}
+.hero .cond{font-size:16px;font-weight:500;opacity:.95;margin-top:-2px}
+.hero .sum{font-size:14px;opacity:.9;margin-top:6px}
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;margin-top:16px;
+  background:rgba(255,255,255,.22);border-radius:12px;overflow:hidden}
+.metrics div{background:rgba(255,255,255,.10);padding:8px 10px;text-align:center}
+.metrics b{display:block;font-size:16px;font-weight:600}
+.metrics span{font-size:11px;opacity:.85}
+
+.sec{margin:22px 20px 8px;font-size:13px;font-weight:600;color:var(--ink2);letter-spacing:.3px;text-transform:uppercase}
+.card{margin:0 16px;background:var(--card);border-radius:var(--radius);overflow:hidden}
+.row{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:.5px solid var(--sep)}
+.row:last-child{border-bottom:0}
+.row .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;background:var(--fill);
+  font-size:15px;flex:none}
+.row .body{flex:1;min-width:0}
+.row .k{font-size:13px;color:var(--ink2);margin-bottom:1px}
+.row .v{font-size:17px;font-weight:500;overflow-wrap:anywhere}
+.row .tr{color:var(--ink2);font-size:15px}
+
+.verdict{padding:16px 16px 14px}
+.verdict .big{font-size:22px;font-weight:700;letter-spacing:-.3px;line-height:1.3}
+.verdict .sub{color:var(--ink2);font-size:15px;margin-top:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 14px}
+.chip{font-size:12px;padding:5px 9px;border-radius:9px;background:var(--fill);color:var(--ink2)}
+
+.plan{padding:16px}
+.plan .h{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.plan .h .n{font-size:20px;font-weight:700;letter-spacing:-.3px}
+.plan .h .s{font-size:13px;color:var(--ink2)}
+.kv{display:flex;gap:18px;margin-top:12px}
+.kv div{flex:1}
+.kv b{display:block;font-size:17px}
+.kv span{font-size:12px;color:var(--ink2)}
+.steps{margin-top:14px;border-top:.5px solid var(--sep);padding-top:12px}
+.steps li{list-style:none;font-size:15px;color:var(--ink);padding:5px 0;display:flex;gap:8px}
+.steps li i{font-style:normal;color:var(--blue)}
+
+.btn{width:calc(100% - 32px);margin:12px 16px 0;height:50px;border:0;border-radius:12px;background:var(--blue);
+  color:#fff;font-size:17px;font-weight:600;font-family:inherit}
+.btn:active{opacity:.82}
+.btn.ghost{background:var(--fill);color:var(--blue);margin-top:8px}
+.btn.done{background:var(--green)}
+.tip{color:var(--ink2);font-size:13px;margin:8px 20px 0;line-height:1.5}
+
+.dots{display:flex;gap:6px;margin-top:10px}
+.dot{width:100%;height:6px;border-radius:3px;background:var(--fill)}
+.dot.on{background:var(--green)}
+
+.tog{width:51px;height:31px;border-radius:16px;background:#E4E4E9;position:relative;flex:none;transition:.2s}
+.tog.on{background:var(--green)}
+.tog i{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 2px #0002;transition:.25s}
+.tog.on i{transform:translateX(20px)}
+
+.sheet{position:fixed;inset:0;z-index:20;display:none}
+.sheet.show{display:block}
+.mask{position:absolute;inset:0;background:#0009;backdrop-filter:blur(2px)}
+.panel{position:absolute;left:0;right:0;bottom:0;max-height:86vh;overflow:auto;background:var(--bg);
+  border-radius:20px 20px 0 0;padding:8px 0 calc(20px + env(safe-area-inset-bottom));animation:up .25s ease}
+@keyframes up{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.panel .bar{width:36px;height:5px;border-radius:3px;background:var(--sep);margin:6px auto 12px}
+.panel h2{margin:0 20px 8px;font-size:20px;font-weight:700}
+.panel p{margin:0 20px 10px;color:var(--ink2);font-size:15px;line-height:1.55}
+.panel ol{margin:0 20px;color:var(--ink);font-size:15px;line-height:1.7;padding-left:18px}
+.panel code{background:var(--fill);border-radius:5px;padding:1px 5px;font-size:13px;word-break:break-all}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;
+  animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
