@@ -1,1 +1,68 @@
-@@INDEX@@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f7f8fa">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="工地小管家">
+<meta name="description" content="小建筑公司的工地日常：施工日志、材料台账、安全巡检、班组考勤，手机上两下录完。">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<link rel="stylesheet" href="css/s1.css">
+<link rel="stylesheet" href="css/s2.css">
+<link rel="stylesheet" href="css/s3.css">
+<style>
+  .boot{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .boot .ring{width:40px;height:40px;border-radius:50%;border:3px solid #e6e9ee;border-top-color:#ff6a13;animation:spin .9s linear infinite}
+  .boot .t{margin-top:16px;font-size:15px;font-weight:700;color:#606a78}
+  .boot .s{margin-top:6px;font-size:13px;color:#8a94a3;line-height:1.5;max-width:260px}
+  .boot .rt{margin-top:18px;height:46px;padding:0 24px;border-radius:12px;background:#ff6a13;color:#fff;font-size:15px;font-weight:800;border:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="hd">
+    <div class="hd-l">
+      <div class="hd-name" id="hd-name">工地小管家</div>
+      <div class="hd-sub" id="hd-sub">施工日志 · 材料台账 · 安全巡检 · 考勤</div>
+    </div>
+    <button class="hd-btn" id="hd-switch" type="button">切换工地</button>
+  </header>
+  <main id="view"></main>
+  <nav class="tabbar">
+    <button type="button" data-r="home" class="on"><svg viewBox="0 0 24 24"><path d="M4 10.6V20h6.2v-5.4h3.6V20H20V10.6L12 4z"/></svg><span>工地</span></button>
+    <button type="button" data-r="logs"><svg viewBox="0 0 24 24"><rect x="4.5" y="3.5" width="15" height="17" rx="2.2"/><path d="M8.2 8.4h7.6M8.2 12h7.6M8.2 15.6h4.6"/></svg><span>日志</span></button>
+    <button type="button" data-r="mats"><svg viewBox="0 0 24 24"><path d="M3.4 8.4L12 4.2l8.6 4.2L12 12.6z"/><path d="M3.4 8.4v8.4L12 21l8.6-4.2V8.4"/><path d="M12 12.6v8.4"/></svg><span>材料</span></button>
+    <button type="button" data-r="checks"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.6"/><path d="M8.2 12.4l2.8 2.8 5-6.2"/></svg><span>巡检</span></button>
+    <button type="button" data-r="more"><svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="18" cy="12" r="1.7"/></svg><span>更多</span></button>
+  </nav>
+</div>
+<script>
+// 弱网兜底：脚本失败自动重试，仍失败给出重试按钮
+(function(){
+  var view=document.getElementById('view');
+  function boot(msg){ view.innerHTML='<div class="boot"><div class="ring"></div><div class="t">加载中…</div>'+(msg?'<div class="s">'+msg+'</div>':'')+'</div>'; }
+  function fail(){ view.innerHTML='<div class="boot"><div class="t">加载失败</div><div class="s">网络不太好。你的数据存在本机，不会丢。点下面重试。</div><button class="rt" id="boot-rt">重新加载</button></div>'; document.getElementById('boot-rt').onclick=start; }
+  function loadScript(src, a){
+    return new Promise(function(res, rej){
+      var s=document.createElement('script'); s.src=src+(a?'?r='+a:''); s.async=false;
+      s.onload=function(){res()};
+      s.onerror=function(){ s.remove(); if(a<3){ setTimeout(function(){ loadScript(src,a+1).then(res,rej) }, 400*(a+1)); } else rej(new Error('fail '+src)); };
+      document.body.appendChild(s);
+    });
+  }
+  var PARTS=['js/p1.js','js/p2.js','js/p3.js','js/p4.js','js/p5.js','js/p6.js','js/p7.js','js/p8.js','js/p9.js'];
+  function start(){
+    boot();
+    var i=0;
+    (function next(){
+      if(i>=PARTS.length){ return; }
+      loadScript(PARTS[i],0).then(function(){ i++; next(); }).catch(fail);
+    })();
+  }
+  start();
+})();
+</script>
+</body>
+</html>
