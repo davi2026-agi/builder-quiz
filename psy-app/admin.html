@@ -98,8 +98,19 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
     else document.getElementById('gErr').textContent = '口令不对';
   };
 
-  const get = k => fetch(API + '/get/' + NS + '/' + k, { cache: 'no-store' })
-    .then(r => r.ok ? r.json() : null).then(j => (j && j.value) || 0).catch(() => 0);
+  /* 串行读取：并发 33 个请求会被计数服务限流，读到的 0 是假的 */
+  async function get(k) {
+    for (let i = 0; i < 2; i++) {
+      try {
+        const r = await fetch(API + '/get/' + NS + '/' + k, { cache: 'no-store' });
+        if (r.status === 404) return 0;
+        if (r.ok) { const j = await r.json(); return (j && j.value) || 0; }
+      } catch (e) { }
+      await new Promise(z => setTimeout(z, 250));
+    }
+    return -1;
+  }
+  const V0 = v => v < 0 ? '–' : v;
 
   function bar(n, max) { return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; }
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
@@ -108,17 +119,22 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
     const keys = ['pageviews', 'devices', 'firstvisit', 'starts', 'tests', 'completes', 'doneUsers']
       .concat(ARCH.map(a => 'arch.' + a[0]))
       .concat(Object.keys(DIM).flatMap(k => ['dim.' + k + '.low', 'dim.' + k + '.mid', 'dim.' + k + '.high']));
-    const vals = await Promise.all(keys.map(get));
+    const vals = [];
+    for (let i = 0; i < keys.length; i++) {
+      vals.push(await get(keys[i]));
+      if (i % 6 === 5) await new Promise(z => setTimeout(z, 130));
+    }
     const V = {};
     keys.forEach((k, i) => V[k] = vals[i]);
+    const bad = vals.filter(v => v < 0).length;
 
     const pv = V.pageviews, uv = V.devices, done = V.completes, users = V.doneUsers;
-    const rate = uv > 0 ? Math.round(done / uv * 100) : 0;
+    const rate = uv > 0 ? Math.round(Math.max(0, done) / uv * 100) : 0;
     document.getElementById('kpi').innerHTML = [
-      ['页面访问', pv, 'PV，含重复打开'],
-      ['独立设备', uv, '清缓存会被重复计'],
-      ['算完次数', done, '点「开始照见」并出结果'],
-      ['完成率', rate + '%', '按独立设备算']
+      ['页面访问', V0(pv), 'PV，含重复打开'],
+      ['独立设备', V0(uv), '清缓存会被重复计'],
+      ['算完次数', V0(done), '点「开始照见」并出结果'],
+      ['完成率', (uv < 0 || done < 0) ? '–' : rate + '%', '按独立设备算']
     ].map(x => `<div class="k"><div class="lb">${x[0]}</div><div class="v">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');
 
     const fmax = Math.max(pv, 1);
@@ -127,15 +143,15 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
       ['点开始', V.starts, ''],
       ['出结果', done, '']
     ].map((x, i) => `<div class="frow"><span class="nm">${x[0]}</span><span class="bar"><i style="width:${bar(x[1], fmax)}%;opacity:${1 - i * .18}"></i></span><span class="n">${x[1]}</span></div>`).join('')
-      + `<div class="note">点开始 ${V.starts} 次、选完题 ${V.tests} 次、出结果 ${done} 次。完测人数（去重）${users}。</div>`;
+      + `<div class="note">点开始 ${V0(V.starts)} 次、选完题 ${V0(V.tests)} 次、出结果 ${V0(done)} 次。完测人数（去重）${V0(users)}。${bad ? '有 ' + bad + ' 项读取失败（上方显示 –），点刷新重试。' : ''}</div>`;
 
-    const amax = Math.max(...ARCH.map(a => V['arch.' + a[0]]), 1);
     const archRows = ARCH.map(a => ({ n: a[1], v: V['arch.' + a[0]] })).sort((x, y) => y.v - x.v);
+    const archMax = Math.max(...archRows.map(x => x.v), 1);
     document.getElementById('arch').innerHTML = archRows.map(x =>
-      `<div class="arow"><div class="t"><b>${esc(x.n)}</b><span>${x.v}</span></div><div class="b"><i style="width:${bar(x.v, amax)}%"></i></div></div>`).join('');
+      `<div class="arow"><div class="t"><b>${esc(x.n)}</b><span>${V0(x.v)}</span></div><div class="b"><i style="width:${bar(Math.max(0, x.v), archMax)}%"></i></div></div>`).join('');
 
     document.getElementById('dims').innerHTML = Object.keys(DIM).map(k => {
-      const lo = V['dim.' + k + '.low'], mid = V['dim.' + k + '.mid'], hi = V['dim.' + k + '.high'];
+      const lo = Math.max(0, V['dim.' + k + '.low']), mid = Math.max(0, V['dim.' + k + '.mid']), hi = Math.max(0, V['dim.' + k + '.high']);
       const t = lo + mid + hi || 1;
       return `<div class="dimrow"><span class="nm">${DIM[k]}</span><span class="stk">` +
         `<i style="width:${(lo / t * 100).toFixed(1)}%;background:#4b4a5c"></i>` +
