@@ -112,7 +112,7 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
   }
   const V0 = v => v < 0 ? '–' : v;
 
-  function bar(n, max) { return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; }
+  function bar(n, max) { if (n <= 0) return 0; return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; }
   const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 
   async function load() {
