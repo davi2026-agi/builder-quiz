@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07070c">
+<title>照见 · 六面镜子</title>
+<meta name="description" content="用八字、紫微、星座、六爻、梅花与 MBTI 六面镜子，照同一个人。">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230b0b12'/%3E%3Ccircle cx='90' cy='90' r='46' fill='none' stroke='%23fff' stroke-opacity='.5' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+  <div class="grain"></div>
+</div>
+
+<header class="hd">
+  <div class="logo">照见</div>
+  <div class="hd-r" id="hdRight">六面镜子</div>
+</header>
+
+<main>
+  <section class="intro" id="intro">
+    <div class="kick">SIX MIRRORS, ONE SELF</div>
+    <h1>六面镜子<br>照同一个人</h1>
+    <p class="lead">八字看你的底色，紫微看你落在哪一格，星座看你的季节，六爻与梅花看此刻的势，MBTI 看你如何做决定。<br>它们不是预言，是六种观察自己的角度。</p>
+    <button class="cta" id="start">开始照见 <span>→</span></button>
+    <div class="hint-line">约 3 分钟 · 数据只留在你的手机里</div>
+  </section>
+
+  <section class="form" id="form" hidden>
+    <div class="steps">
+      <div class="bar"><i id="prog"></i></div>
+      <div class="step-label" id="stepLabel">01 / 03 · 出生信息</div>
+    </div>
+    <div id="formBody"></div>
+  </section>
+
+  <section class="result" id="result" hidden>
+    <div id="resultBody"></div>
+  </section>
+</main>
+
+<footer class="ft">
+  <div class="ft-l">照见 · 自我认知工具</div>
+  <div class="ft-r">不构成医疗、财务或人生预测建议</div>
+</footer>
+
+<div class="toast" id="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>
