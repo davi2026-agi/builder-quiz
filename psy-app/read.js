@@ -336,12 +336,13 @@
         ${(cg.rep.length || cg.con.length) ? `<div class="sec-t">哪几件事反复出现</div>
         <div class="says">${cg.rep.map(x => `<div class="say">
           <div class="sh"><b>${esc2(x.n)}</b><i>${esc2(x.list.length)} 个体系同向</i></div>
-          <p>${esc2(x.list.join('、'))} 都指向这一项，合计 ${esc2(trim(x.pos))}。${esc2(NOTE[x.k] || '这不是某一个体系的说法，是重复出现的事实')}。重复出现的东西才值得当真——单个体系说你好，可能是它自己的偏好。</p>
+          <p>${esc2(x.list.join('、'))} 都指向这一项，合计 ${esc2(trim(x.pos))}。${esc2(NOTE[x.k] || '这不是某一个体系的说法，是重复出现的事实')}。</p>
         </div>`).join('')}
         ${cg.con.map(x => `<div class="say">
           <div class="sh"><b>${esc2(x.n)}</b><i>体系之间打架</i></div>
           <p>有 ${esc2(trim(x.pos))} 的支持，也有 ${esc2(trim(x.neg))} 的抵消。这一维我不给单一结论：${esc2(x.n)} 于你不是天生高或天生低，是“看场合”——你需要判断的是，在哪种场合你愿意让它高起来。</p>
-        </div>`).join('')}</div>` : ''}
+        </div>`).join('')}
+        ${cg.rep.length ? `<div class="say" style="border-top:none;padding-top:2px"><div class="ct">说明：重复只代表这几套体系之间看法一致，不保证是真的；它们一起错的可能也在这里。</div></div>` : ''}</div>` : ''}
         <div class="sec-t">八段断语</div>
         <div class="says">
           ${says.map(s => `<div class="say">
