@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07070c">
+<meta name="robots" content="noindex,nofollow">
+<title>照见 · 计数看板</title>
+<style>
+:root{--bg:#07070c;--ink:#ece9f4;--ink2:#a8a6b6;--ink3:#6f6d7e;--line:rgba(255,255,255,.1);--vio:#b18cff;--ora:#ff9f6b;--tea:#5eead4}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro SC","PingFang SC","Helvetica Neue",sans-serif;
+  background-image:radial-gradient(900px 500px at 50% -10%,rgba(124,140,255,.16),transparent 60%),radial-gradient(700px 420px at 15% 10%,rgba(177,140,255,.12),transparent 60%);
+  background-attachment:fixed;padding:0 16px 40px;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto}
+header{display:flex;align-items:center;justify-content:space-between;padding:22px 0 14px;position:sticky;top:0;z-index:5;
+  background:linear-gradient(180deg,rgba(7,7,12,.92),rgba(7,7,12,.55) 70%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+h1{margin:0;font-size:17px;font-weight:600;letter-spacing:.02em}
+h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-spacing:.14em;margin-top:3px}
+.gate{max-width:520px;margin:70px auto 0;text-align:center}
+.gate p{color:var(--ink2);font-size:13px;margin:0 0 14px}
+.gate input{width:100%;max-width:240px;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.05);color:#fff;font-size:15px;text-align:center}
+.gate button{margin-top:12px;display:block;width:100%;max-width:240px;margin-left:auto;margin-right:auto;padding:12px;border-radius:12px;border:0;
+  background:linear-gradient(135deg,#7c8cff,#a06bff);color:#fff;font-size:14px;font-weight:600}
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 16px}
+.k{border:1px solid var(--line);border-radius:16px;padding:13px 14px;background:linear-gradient(160deg,rgba(255,255,255,.055),rgba(255,255,255,.015))}
+.k .lb{font-size:10.5px;color:var(--ink3);letter-spacing:.05em}
+.k .v{font-size:26px;font-weight:600;letter-spacing:-.02em;margin-top:3px;font-variant-numeric:tabular-nums}
+.k .sub{font-size:10.5px;color:var(--ink3);margin-top:2px}
+.panel{border:1px solid var(--line);border-radius:18px;padding:15px 14px;background:rgba(255,255,255,.024);margin:0 0 14px}
+.panel h3{margin:0 0 2px;font-size:13px;font-weight:600}
+.panel .s{font-size:10.5px;color:var(--ink3);margin-bottom:12px}
+.fun{margin-top:6px}
+.frow{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:12px}
+.frow .nm{width:52px;color:var(--ink2);flex:none}
+.frow .bar{flex:1;height:22px;border-radius:7px;background:rgba(255,255,255,.05);position:relative;overflow:hidden}
+.frow .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:7px;background:linear-gradient(90deg,#7c8cff,#a06bff);transition:width .6s cubic-bezier(.16,1,.3,1)}
+.frow .n{width:46px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink);flex:none}
+.arow{margin:9px 0}
+.arow .t{display:flex;justify-content:space-between;font-size:12px;color:var(--ink2);margin-bottom:4px}
+.arow .t b{color:#fff;font-weight:500}
+.arow .b{height:6px;border-radius:99px;background:rgba(255,255,255,.05);overflow:hidden}
+.arow .b i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#5eead4,#7c8cff);transition:width .6s cubic-bezier(.16,1,.3,1)}
+.dimrow{display:flex;align-items:center;gap:8px;margin:8px 0;font-size:11.5px}
+.dimrow .nm{width:46px;color:var(--ink2);flex:none}
+.dimrow .stk{flex:1;height:16px;border-radius:6px;overflow:hidden;display:flex;background:rgba(255,255,255,.05)}
+.dimrow .stk i{height:100%;display:block;transition:width .6s cubic-bezier(.16,1,.3,1)}
+.dimrow .lg{font-size:9.5px;color:var(--ink3);width:104px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+.note{font-size:10.5px;color:var(--ink3);line-height:1.8;margin-top:6px}
+.btn{background:rgba(255,255,255,.07);border:1px solid var(--line);color:var(--ink);padding:8px 12px;border-radius:10px;font-size:12px}
+.err{color:#ff9f6b;font-size:11.5px;margin-top:10px;line-height:1.7}
+</style>
+</head>
+<body>
+
+<div class="gate" id="gate" hidden>
+  <p>内部看板，需要口令</p>
+  <input id="pw" type="password" placeholder="口令" autocomplete="off">
+  <button id="ok">进入</button>
+  <div class="err" id="gErr"></div>
+</div>
+
+<div class="wrap" id="app" hidden>
+  <header>
+    <h1>计数看板<small>照见 · 匿名事件</small></h1>
+    <button class="btn" id="re">刷新</button>
+  </header>
+  <div class="kpi" id="kpi"></div>
+  <div class="panel"><h3>漏斗</h3><div class="s">访问 → 开始 → 算完，看在哪一步掉人</div><div class="fun" id="fun"></div></div>
+  <div class="panel"><h3>原型分布</h3><div class="s">算完的人落在哪个原型</div><div id="arch"></div></div>
+  <div class="panel"><h3>五维分档</h3><div class="s">低 &lt;45 · 中 45–69 · 高 ≥70，看整体偏在哪一侧</div><div id="dims"></div></div>
+  <div class="panel"><h3>口径</h3>
+    <div class="note">只记匿名计数，不存生日、时辰、出生地、IP 与用户标识。<br>「独立设备」按浏览器 localStorage 标记计，清缓存会被当成新设备，因此该数偏高于真实人数。<br>数据源 Abacus（开源计数服务），计数键在 zhaojian-2026 命名空间，任何人可读、可增。</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+(function () {
+  const NS = 'zhaojian-2026', API = 'https://abacus.jasoncameron.dev';
+  const PWH = 'b700b';            /* 口令派生：zhaojian */
+  const h = s => { let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 1000003; return x.toString(16).slice(0, 6); };
+
+  const DIM = { ord: '秩序感', drv: '进取心', warm: '共情度', open: '探索欲', grit: '抗压力' };
+  const ARCH = [['builder', '建造者'], ['attacker', '攻坚者'], ['coordinator', '协调者'], ['feeler', '感受者'], ['pioneer', '拓荒者'],
+                ['watcher', '守望者'], ['anchor', '托底者'], ['stalker', '潜行者'], ['architect', '架构师'], ['leader', '带队者'], ['observer', '观察者']];
+
+  function gateOK() {
+    const q = new URLSearchParams(location.search).get('k');
+    if (q && h(q) === PWH) return true;
+    try { return sessionStorage.getItem('zj.adm') === PWH; } catch (e) { return false; }
+  }
+  function show() { document.getElementById('gate').hidden = true; document.getElementById('app').hidden = false; load(); }
+
+  document.getElementById('ok').onclick = () => {
+    const v = document.getElementById('pw').value.trim();
+    if (h(v) === PWH) { try { sessionStorage.setItem('zj.adm', PWH); } catch (e) { } show(); }
+    else document.getElementById('gErr').textContent = '口令不对';
+  };
+
+  const get = k => fetch(API + '/get/' + NS + '/' + k, { cache: 'no-store' })
+    .then(r => r.ok ? r.json() : null).then(j => (j && j.value) || 0).catch(() => 0);
+
+  function bar(n, max) { return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; }
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+
+  async function load() {
+    const keys = ['pageviews', 'devices', 'firstvisit', 'starts', 'tests', 'completes', 'doneUsers']
+      .concat(ARCH.map(a => 'arch.' + a[0]))
+      .concat(Object.keys(DIM).flatMap(k => ['dim.' + k + '.low', 'dim.' + k + '.mid', 'dim.' + k + '.high']));
+    const vals = await Promise.all(keys.map(get));
+    const V = {};
+    keys.forEach((k, i) => V[k] = vals[i]);
+
+    const pv = V.pageviews, uv = V.devices, done = V.completes, users = V.doneUsers;
+    const rate = uv > 0 ? Math.round(done / uv * 100) : 0;
+    document.getElementById('kpi').innerHTML = [
+      ['页面访问', pv, 'PV，含重复打开'],
+      ['独立设备', uv, '清缓存会被重复计'],
+      ['算完次数', done, '点「开始照见」并出结果'],
+      ['完成率', rate + '%', '按独立设备算']
+    ].map(x => `<div class="k"><div class="lb">${x[0]}</div><div class="v">${x[1]}</div><div class="sub">${x[2]}</div></div>`).join('');
+
+    const fmax = Math.max(pv, 1);
+    document.getElementById('fun').innerHTML = [
+      ['访问', pv, ''],
+      ['点开始', V.starts, ''],
+      ['出结果', done, '']
+    ].map((x, i) => `<div class="frow"><span class="nm">${x[0]}</span><span class="bar"><i style="width:${bar(x[1], fmax)}%;opacity:${1 - i * .18}"></i></span><span class="n">${x[1]}</span></div>`).join('')
+      + `<div class="note">点开始 ${V.starts} 次、选完题 ${V.tests} 次、出结果 ${done} 次。完测人数（去重）${users}。</div>`;
+
+    const amax = Math.max(...ARCH.map(a => V['arch.' + a[0]]), 1);
+    const archRows = ARCH.map(a => ({ n: a[1], v: V['arch.' + a[0]] })).sort((x, y) => y.v - x.v);
+    document.getElementById('arch').innerHTML = archRows.map(x =>
+      `<div class="arow"><div class="t"><b>${esc(x.n)}</b><span>${x.v}</span></div><div class="b"><i style="width:${bar(x.v, amax)}%"></i></div></div>`).join('');
+
+    document.getElementById('dims').innerHTML = Object.keys(DIM).map(k => {
+      const lo = V['dim.' + k + '.low'], mid = V['dim.' + k + '.mid'], hi = V['dim.' + k + '.high'];
+      const t = lo + mid + hi || 1;
+      return `<div class="dimrow"><span class="nm">${DIM[k]}</span><span class="stk">` +
+        `<i style="width:${(lo / t * 100).toFixed(1)}%;background:#4b4a5c"></i>` +
+        `<i style="width:${(mid / t * 100).toFixed(1)}%;background:#7c8cff"></i>` +
+        `<i style="width:${(hi / t * 100).toFixed(1)}%;background:#5eead4"></i></span>` +
+        `<span class="lg">${lo}/${mid}/${hi}</span></div>`;
+    }).join('') + `<div class="note">数字依次为 低/中/高 的人数。全部为 0 说明还没有人算完，或数据还没同步。</div>`;
+
+    document.getElementById('re').dataset.t = new Date().toLocaleString('zh-CN', { hour12: false });
+  }
+  document.addEventListener('click', e => { if (e.target.id === 're') load(); });
+
+  if (gateOK()) show(); else document.getElementById('gate').hidden = false;
+})();
+</script>
+</body>
+</html>
