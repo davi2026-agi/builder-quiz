@@ -80,10 +80,16 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
   const NS = 'zhaojian-2026', API = 'https://abacus.jasoncameron.dev';
   const PWH = 'b700b';            /* 口令派生：zhaojian */
   const h = s => { let x = 0; for (let i = 0; i < s.length; i++) x = (x * 31 + s.charCodeAt(i)) % 1000003; return x.toString(16).slice(0, 6); };
+  const sleep = ms => new Promise(z => setTimeout(z, ms));
 
   const DIM = { ord: '秩序感', drv: '进取心', warm: '共情度', open: '探索欲', grit: '抗压力' };
   const ARCH = [['builder', '建造者'], ['attacker', '攻坚者'], ['coordinator', '协调者'], ['feeler', '感受者'], ['pioneer', '拓荒者'],
                 ['watcher', '守望者'], ['anchor', '托底者'], ['stalker', '潜行者'], ['architect', '架构师'], ['leader', '带队者'], ['observer', '观察者']];
+
+  const V0 = v => v < 0 ? '–' : v;
+  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const bar = (n, max) => { if (n <= 0) return 0; return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; };
+  const loading = txt => `<div class="note">${esc(txt)}…</div>`;
 
   function gateOK() {
     const q = new URLSearchParams(location.search).get('k');
@@ -98,38 +104,36 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
     else document.getElementById('gErr').textContent = '口令不对';
   };
 
-  /* 串行读取：并发 33 个请求会被计数服务限流，读到的 0 是假的 */
-  async function get(k) {
+  /* 单键读取：404 = 该事件还没发生，记 0；两次都失败才记 -1（显示 –） */
+  async function one(k) {
     for (let i = 0; i < 2; i++) {
       try {
         const r = await fetch(API + '/get/' + NS + '/' + k, { cache: 'no-store' });
         if (r.status === 404) return 0;
-        if (r.ok) { const j = await r.json(); return (j && j.value) || 0; }
+        if (r.ok) { const j = await r.json(); return (j && j.value) | 0; }
+        if (r.status < 500) return 0;
       } catch (e) { }
-      await new Promise(z => setTimeout(z, 250));
+      await sleep(240 * (i + 1));
     }
     return -1;
   }
-  const V0 = v => v < 0 ? '–' : v;
-
-  function bar(n, max) { if (n <= 0) return 0; return max > 0 ? Math.max(2, Math.round(n / max * 100)) : 0; }
-  const esc = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-
-  async function load() {
-    const keys = ['pageviews', 'devices', 'firstvisit', 'starts', 'tests', 'completes', 'doneUsers']
-      .concat(ARCH.map(a => 'arch.' + a[0]))
-      .concat(Object.keys(DIM).flatMap(k => ['dim.' + k + '.low', 'dim.' + k + '.mid', 'dim.' + k + '.high']));
-    const vals = [];
-    for (let i = 0; i < keys.length; i++) {
-      vals.push(await get(keys[i]));
-      if (i % 6 === 5) await new Promise(z => setTimeout(z, 130));
+  /* 3 路并发：33 个全并发会被计数服务限流（读回的 0 是假的），纯串行又要 30 秒白屏 */
+  async function burst(keys, out, bad) {
+    let i = 0;
+    async function w() {
+      while (i < keys.length) {
+        const k = keys[i++];
+        const v = await one(k);
+        out[k] = v;
+        if (v < 0) bad.push(k);
+      }
     }
-    const V = {};
-    keys.forEach((k, i) => V[k] = vals[i]);
-    const bad = vals.filter(v => v < 0).length;
+    await Promise.all(Array.from({ length: Math.min(3, keys.length) }, w));
+  }
 
+  function paintKPI(V, bad) {
     const pv = V.pageviews, uv = V.devices, done = V.completes, users = V.doneUsers;
-    const rate = uv > 0 ? Math.round(Math.max(0, done) / uv * 100) : 0;
+    const rate = (uv > 0 && done >= 0) ? Math.round(Math.max(0, done) / uv * 100) : 0;
     document.getElementById('kpi').innerHTML = [
       ['页面访问', V0(pv), 'PV，含重复打开'],
       ['独立设备', V0(uv), '清缓存会被重复计'],
@@ -139,17 +143,19 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
 
     const fmax = Math.max(pv, 1);
     document.getElementById('fun').innerHTML = [
-      ['访问', pv, ''],
-      ['点开始', V.starts, ''],
-      ['出结果', done, '']
-    ].map((x, i) => `<div class="frow"><span class="nm">${x[0]}</span><span class="bar"><i style="width:${bar(x[1], fmax)}%;opacity:${1 - i * .18}"></i></span><span class="n">${x[1]}</span></div>`).join('')
-      + `<div class="note">点开始 ${V0(V.starts)} 次、选完题 ${V0(V.tests)} 次、出结果 ${V0(done)} 次。完测人数（去重）${V0(users)}。${bad ? '有 ' + bad + ' 项读取失败（上方显示 –），点刷新重试。' : ''}</div>`;
+      ['访问', pv], ['点开始', V.starts], ['出结果', done]
+    ].map((x, i) => `<div class="frow"><span class="nm">${x[0]}</span><span class="bar"><i style="width:${bar(x[1], fmax)}%;opacity:${1 - i * .18}"></i></span><span class="n">${V0(x[1])}</span></div>`).join('')
+      + `<div class="note">点开始 ${V0(V.starts)} 次、选完题 ${V0(V.tests)} 次、出结果 ${V0(done)} 次。完测人数（去重）${V0(users)}。${bad.length ? '有 ' + bad.length + ' 项读取失败（显示 –），点刷新重试。' : ''}</div>`;
+  }
 
-    const archRows = ARCH.map(a => ({ n: a[1], v: V['arch.' + a[0]] })).sort((x, y) => y.v - x.v);
-    const archMax = Math.max(...archRows.map(x => x.v), 1);
-    document.getElementById('arch').innerHTML = archRows.map(x =>
-      `<div class="arow"><div class="t"><b>${esc(x.n)}</b><span>${V0(x.v)}</span></div><div class="b"><i style="width:${bar(Math.max(0, x.v), archMax)}%"></i></div></div>`).join('');
+  function paintArch(V) {
+    const rows = ARCH.map(a => ({ n: a[1], v: V['arch.' + a[0]] })).sort((x, y) => y.v - x.v);
+    const mx = Math.max(...rows.map(x => x.v), 1);
+    document.getElementById('arch').innerHTML = rows.map(x =>
+      `<div class="arow"><div class="t"><b>${esc(x.n)}</b><span>${V0(x.v)}</span></div><div class="b"><i style="width:${bar(Math.max(0, x.v), mx)}%"></i></div></div>`).join('');
+  }
 
+  function paintDims(V) {
     document.getElementById('dims').innerHTML = Object.keys(DIM).map(k => {
       const lo = Math.max(0, V['dim.' + k + '.low']), mid = Math.max(0, V['dim.' + k + '.mid']), hi = Math.max(0, V['dim.' + k + '.high']);
       const t = lo + mid + hi || 1;
@@ -159,6 +165,25 @@ h1 small{display:block;font-size:10px;font-weight:400;color:var(--ink3);letter-s
         `<i style="width:${(hi / t * 100).toFixed(1)}%;background:#5eead4"></i></span>` +
         `<span class="lg">${lo}/${mid}/${hi}</span></div>`;
     }).join('') + `<div class="note">数字依次为 低/中/高 的人数。全部为 0 说明还没有人算完，或数据还没同步。</div>`;
+  }
+
+  /* 三段渲染：核心数字先出，图表后补，避免整页白屏等 30 秒 */
+  async function load() {
+    const V = {}, bad = [];
+    document.getElementById('kpi').innerHTML = ['页面访问', '独立设备', '算完次数', '完成率']
+      .map(t => `<div class="k"><div class="lb">${t}</div><div class="v">…</div><div class="sub">读取中</div></div>`).join('');
+    document.getElementById('fun').innerHTML = loading('读取中');
+    document.getElementById('arch').innerHTML = loading('读取中');
+    document.getElementById('dims').innerHTML = loading('读取中');
+
+    await burst(['pageviews', 'devices', 'firstvisit', 'starts', 'tests', 'completes', 'doneUsers'], V, bad);
+    paintKPI(V, bad);
+
+    await burst(ARCH.map(a => 'arch.' + a[0]), V, bad);
+    paintArch(V);
+
+    await burst(Object.keys(DIM).flatMap(k => ['dim.' + k + '.low', 'dim.' + k + '.mid', 'dim.' + k + '.high']), V, bad);
+    paintDims(V);
 
     document.getElementById('re').dataset.t = new Date().toLocaleString('zh-CN', { hour12: false });
   }
